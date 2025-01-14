@@ -1,69 +1,57 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { HomeOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { onMounted } from 'vue'
+import { useUserStore } from '@/stores/userInfo.js'
+
+const userInfo = useUserStore()
+
+onMounted(() => {
+  const user = userInfo.getUser()
+  if (user) {
+    console.log(user)
+  }
+})
 </script>
 
 <template>
-  <!--<header>-->
-  <!--  <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />-->
-
-  <!--  <div class="wrapper">-->
-  <!--    <HelloWorld msg="You did it!" />-->
-
-  <!--    <nav>-->
-  <!--      <RouterLink to="/">Home</RouterLink>-->
-  <!--      <RouterLink to="/about">About</RouterLink>-->
-  <!--    </nav>-->
-  <!--  </div>-->
-  <!--</header>-->
-  <a-config-provider
-    :theme="{
-      token: {
-        colorPrimary: '#00b96b',
-      },
-    }"
-  >
+  <!--顶部导航栏-->
+  <div class="top-navbar">
+    <a-breadcrumb style="margin-left: 100px">
+      <!--首页-->
+      <a-breadcrumb-item>
+        <router-link to="/">
+          <home-outlined />
+          <span>首页</span>
+        </router-link>
+      </a-breadcrumb-item>
+      <!--登录-->
+      <a-breadcrumb-item>
+        <router-link to="/login" class="route-link">
+          <user-outlined />
+          <span>你好，请登录</span>
+        </router-link>
+      </a-breadcrumb-item>
+      <!--注册-->
+      <a-breadcrumb-item href="/login">
+        <span>注册</span>
+      </a-breadcrumb-item>
+    </a-breadcrumb>
+  </div>
+  <!--路由页面-->
+  <a-config-provider :theme="{ token: { colorPrimary: '#00b96b' } }">
     <RouterView />
   </a-config-provider>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.top-navbar {
+  padding: 10px 20px;
+  height: auto;
+  background-color: #f0f2f5;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+a :hover{
+  color: #00b96b !important;
 }
 </style>

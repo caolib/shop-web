@@ -4,6 +4,6 @@ import TheWelcome from '../components/TheWelcome.vue'
 
 <template>
   <main>
-    <TheWelcome />
+    <div style="height: 100%; width: 100%"></div>
   </main>
 </template>
