@@ -75,77 +75,94 @@ const loginByGithub = async () => {
 </script>
 
 <template>
-  <div class="login-form">
-    <!-- 表单组件 -->
-    <a-form
-      :model="formState"
-      name="normal_login"
-      @finish="onFinish"
-      @finishFailed="onFinishFailed"
-    >
-      <!-- 用户名表单项 -->
-      <a-form-item
-        label="账号"
-        name="username"
-        :rules="[{ required: true, message: '请输入用户名!' }]"
+  <div class="login-body">
+    <div class="login-form">
+      <!-- 表单组件 -->
+      <a-form
+        :model="formState"
+        name="normal_login"
+        @finish="onFinish"
+        @finishFailed="onFinishFailed"
       >
-        <a-input v-model:value="formState.username">
-          <template #prefix>
-            <UserOutlined class="site-form-item-icon" />
-          </template>
-        </a-input>
-      </a-form-item>
-
-      <!-- 密码表单项 -->
-      <a-form-item
-        label="密码"
-        name="password"
-        :rules="[{ required: true, message: '请输入密码!' }]"
-      >
-        <a-input-password v-model:value="formState.password">
-          <template #prefix>
-            <LockOutlined class="site-form-item-icon" />
-          </template>
-        </a-input-password>
-      </a-form-item>
-
-      <!-- 记住我和忘记密码 -->
-      <a-form-item>
-        <a-form-item name="remember" no-style>
-          <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
+        <!-- 用户名表单项 -->
+        <a-form-item
+          label="账号"
+          name="username"
+          :rules="[{ required: true, message: '请输入用户名!' }]"
+        >
+          <a-input v-model:value="formState.username">
+            <template #prefix>
+              <UserOutlined class="site-form-item-icon" />
+            </template>
+          </a-input>
         </a-form-item>
-        <a class="login-form-forgot" href="">忘记密码</a>
-      </a-form-item>
 
-      <!-- 登录按钮和注册链接 -->
-      <a-form-item>
-        <a-button :disabled="disabled" type="primary" html-type="submit" class="login-form-button">
-          登录
-        </a-button>
-        或
-        <a href="">立即注册</a>
-      </a-form-item>
+        <!-- 密码表单项 -->
+        <a-form-item
+          label="密码"
+          name="password"
+          :rules="[{ required: true, message: '请输入密码!' }]"
+        >
+          <a-input-password v-model:value="formState.password">
+            <template #prefix>
+              <LockOutlined class="site-form-item-icon" />
+            </template>
+          </a-input-password>
+        </a-form-item>
 
-      <!-- 社交账号登录 -->
-      <a-form-item>
-        <a-space>
-          <!--github 登录按钮-->
-          <a-button shape="circle" :icon="h(GithubFilled)" @click="loginByGithub" />
-        </a-space>
-      </a-form-item>
-    </a-form>
+        <!-- 记住我和忘记密码 -->
+        <a-form-item>
+          <a-form-item name="remember" no-style>
+            <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
+          </a-form-item>
+          <a class="login-form-forgot" href="">忘记密码</a>
+        </a-form-item>
+
+        <!-- 登录按钮和注册链接 -->
+        <a-form-item>
+          <a-button
+            :disabled="disabled"
+            type="primary"
+            html-type="submit"
+            class="login-form-button"
+          >
+            登录
+          </a-button>
+          或
+          <a href="">立即注册</a>
+        </a-form-item>
+
+        <!-- 社交账号登录 -->
+        <a-form-item>
+          <a-space>
+            <!--github 登录按钮-->
+            <a-button shape="circle" :icon="h(GithubFilled)" @click="loginByGithub" />
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.login-form {
+<style scoped lang="less">
+@import '@/styles/var';
+
+.login-body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px;
+}
+
+/* 登录表单 */
+.login-form {
+  border: 1px #e8e8e8 solid;
+  margin-top: 100px;
+  width: 50vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 10px;
-  background: #f8f8f8;
   padding: 50px;
-  width: auto;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
