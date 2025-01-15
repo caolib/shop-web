@@ -13,17 +13,37 @@ const instance = axios.create({ baseURL })
 instance.interceptors.response.use(
   //成功回调
   (result) => {
-    // 如果状态码为0，后端发生异常
-    if (result.data.code === 0) {
-      message.error(result.data.msg)
-      return Promise.reject(result)
+    // 如果状态码为200
+    const code = result.data.code
+    const msg = result.data.msg
+    if (code === 200 || code === undefined) return result.data
+    // 异常处理
+    switch (code) {
+      case 400:
+        message.error(msg)
+        break
+      case 401:
+        message.error('请先登录！')
+        router.push('/login')
+        break
+      case 500:
+        message.error(msg)
+        console.log(msg)
+        break
+      default:
+        message.error('未知异常！' + code)
     }
-    return result.data
+    return Promise.reject(result)
   },
   //失败回调
   (error) => {
     const code = error.response.status
+    const msg = error.response.msg
     switch (code) {
+      case 400:
+        message.error(msg)
+        router.push('/login')
+        break
       case 401:
         message.error('请先登录！')
         router.push('/login')
@@ -33,8 +53,8 @@ instance.interceptors.response.use(
         router.push('/login')
         break
       case 500:
-        message.error('服务器繁忙！')
-        console.log(error.response.message)
+        message.error(msg)
+        console.log(msg)
         break
       default:
         message.error('未知异常！' + code)

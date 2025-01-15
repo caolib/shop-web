@@ -1,69 +1,100 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import {
+  HomeOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  ShoppingCartOutlined,
+} from '@ant-design/icons-vue'
+import { onMounted, ref } from 'vue'
+import { useUserStore } from '@/stores/userInfo.js'
+import { message } from 'ant-design-vue'
+
+const userInfo = useUserStore()
+const user = userInfo.user
+const isLogin = ref(false)
+
+onMounted(() => {
+  if (user) {
+    isLogin.value = true
+    console.log(user)
+  }
+})
+
+// 退出登录
+const logout = () => {
+  // todo 退出登录删除用户相关信息和token
+  message.success('退出登录')
+}
 </script>
 
 <template>
-  <!--<header>-->
-  <!--  <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />-->
+  <!--顶部导航栏-->
+  <div class="top-navbar">
+    <a-breadcrumb style="margin-left: 100px">
+      <!--首页-->
+      <a-breadcrumb-item>
+        <router-link to="/">
+          <home-outlined />
+          首页
+        </router-link>
+      </a-breadcrumb-item>
 
-  <!--  <div class="wrapper">-->
-  <!--    <HelloWorld msg="You did it!" />-->
+      <!--登录-->
+      <a-breadcrumb-item>
+        <router-link to="/user" class="route-link">
+          <user-outlined />
+          <span v-if="isLogin"> 你好,{{ user.username }} </span>
+          <span v-else>
+            <router-link to="/login" class="route-link"> 请登录 </router-link>
+          </span>
+        </router-link>
+      </a-breadcrumb-item>
 
-  <!--    <nav>-->
-  <!--      <RouterLink to="/">Home</RouterLink>-->
-  <!--      <RouterLink to="/about">About</RouterLink>-->
-  <!--    </nav>-->
-  <!--  </div>-->
-  <!--</header>-->
-  <a-config-provider
-    :theme="{
-      token: {
-        colorPrimary: '#00b96b',
-      },
-    }"
-  >
-    <RouterView />
+      <!--注册-->
+      <a-breadcrumb-item v-if="!isLogin">
+        <span>注册</span>
+      </a-breadcrumb-item>
+
+      <!--退出登录-->
+      <a-breadcrumb-item v-if="isLogin" @click="logout">
+        <router-link to="/login" class="route-link">
+          <LogoutOutlined />
+          退出登录
+        </router-link>
+      </a-breadcrumb-item>
+
+      <!--购物车-->
+      <a-breadcrumb-item>
+        <router-link to="/cart" class="route-link">
+          <ShoppingCartOutlined />
+          我的购物车
+        </router-link>
+      </a-breadcrumb-item>
+    </a-breadcrumb>
+  </div>
+  <!--路由页面-->
+  <a-config-provider :theme="{ token: { colorPrimary: '#00b96b' } }">
+    <RouterView style="margin-top: 40px" />
+    <a-back-top />
   </a-config-provider>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<style scoped lang="less">
+@import '@/styles/var';
 
-nav {
+.top-navbar {
+  padding: 10px 20px;
+  height: auto;
+  position: fixed;
+  top: 0;
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  z-index: 1000;
+  background: #fff;
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.route-link:hover,
+a:hover {
+  color: @primary-color !important;
 }
 </style>
