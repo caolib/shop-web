@@ -1,11 +1,4 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import {
-  HomeOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  ShoppingCartOutlined,
-} from '@ant-design/icons-vue'
 import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import { message } from 'ant-design-vue'
@@ -90,7 +83,7 @@ const logout = () => {
   top: 0;
   width: 100%;
   z-index: 1000;
-  background: #fff;
+  background: #e7e7e7;
 }
 
 .route-link:hover,

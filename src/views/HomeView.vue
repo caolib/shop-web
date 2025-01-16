@@ -15,9 +15,11 @@ import {
   UserOutlined,
 } from '@ant-design/icons-vue'
 import { searchService } from '@/api/search.js'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, onBeforeUpdate } from 'vue'
 
 const commodity = ref([])
+
+const key = ref('')
 
 // 搜索商品
 const search = async () => {
@@ -27,6 +29,7 @@ const search = async () => {
   })
 }
 
+// 初始化商品信息
 onMounted(() => {
   search()
 })
@@ -48,8 +51,14 @@ const menuItems = [
 
 // 商品分类点击事件
 const handleClick = (item) => {
-  message.success(`商品分类: ${item}`)
+  // message.success(`商品分类: ${item}`)
   router.push({ path: '/search', query: { category: item } })
+}
+
+// 搜索按钮点击事件
+const handleSearchClick = () => {
+  // message.success(`关键字: ${key.value}`)
+  router.push({ path: '/search', query: { key: key.value } })
 }
 </script>
 
@@ -57,12 +66,8 @@ const handleClick = (item) => {
   <div class="layout-main">
     <!--搜索框-->
     <div class="search-input">
-      <a-input-search
-        enter-button
-        size="large"
-        placeholder="搜索商品"
-        style="width: 60vw; margin-top: 20px"
-      />
+      <a-input-search v-model:value="key" enter-button @search="handleSearchClick" size="large" placeholder="搜索商品"
+        style="width: 60vw; margin-top: 20px" />
     </div>
 
     <!--商品展示-->
@@ -73,12 +78,8 @@ const handleClick = (item) => {
           <a-menu-item v-for="menuItem in menuItems" :key="menuItem.key">
             <a-breadcrumb>
               <component :is="menuItem.icon" class="breadcrumb-icon" />
-              <a-breadcrumb-item
-                class="commodity-item"
-                v-for="item in menuItem.items"
-                :key="item"
-                @click="handleClick(item)"
-              >
+              <a-breadcrumb-item class="commodity-item" v-for="item in menuItem.items" :key="item"
+                @click="handleClick(item)">
                 {{ item }}
               </a-breadcrumb-item>
             </a-breadcrumb>
@@ -106,6 +107,8 @@ const handleClick = (item) => {
           </a-col>
         </a-row>
       </div>
+
+
     </div>
   </div>
 </template>
