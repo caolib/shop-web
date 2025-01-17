@@ -16,6 +16,7 @@ import {
 } from '@ant-design/icons-vue'
 import { searchService } from '@/api/search.js'
 import { onMounted, reactive, ref, onBeforeUpdate } from 'vue'
+import { jumpToItem } from '@/router/jump'
 
 const commodity = ref([])
 
@@ -87,13 +88,13 @@ const handleSearchClick = () => {
         </a-menu>
       </div>
 
-      <!--商品展示区-->
+      <!--商品展示卡片-->
       <div class="commodity-display">
         <a-row>
           <a-col :span="6" v-for="item in commodity" :key="item.id">
-            <a-card class="commodity-card" hoverable>
+            <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
               <template #cover>
-                <img :src="item.image" alt="" />
+                <img :src="item.image" />
               </template>
               <a-card-meta>
                 <template #title>
@@ -107,9 +108,8 @@ const handleSearchClick = () => {
           </a-col>
         </a-row>
       </div>
-
-
     </div>
+
   </div>
 </template>
 

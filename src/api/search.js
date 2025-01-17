@@ -9,6 +9,9 @@ const searchService = (searchParams) => {
 }
 
 
+const queryCommodityById = (id) => {
+  return request.get('/commodity/' + id);
+}
 
 
-export { searchService }
+export { searchService, queryCommodityById }

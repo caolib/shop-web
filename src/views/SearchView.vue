@@ -3,15 +3,18 @@ import { onMounted, reactive, ref, computed, h } from 'vue'
 import { message } from 'ant-design-vue'
 import { searchService } from '@/api/search.js'
 import router from '@/router/index.js'
+import { jumpToItem } from '@/router/jump'
 import { CaretDownFilled, CaretUpFilled, CaretUpOutlined } from '@ant-design/icons-vue'
 
-// 商品列表
-const commodity = ref([])
+
+const commodity = ref([]) // 商品列表
+const total = ref(0) // 商品总数
 
 // 搜索商品信息
 const searchCommodity = async () => {
   await searchService(searchParams).then((res) => {
     commodity.value = res.list
+    total.value = res.total
     console.log(res)
   })
 }
@@ -97,16 +100,20 @@ const priceTag = computed(() => {
 
 // 切换排序
 const toggleSort = (e) => {
-  searchParams.sortBy = e
-  searchParams.isAsc = !searchParams.isAsc
+  if (searchParams.sortBy === e)
+    searchParams.isAsc = !searchParams.isAsc
+  else {
+    searchParams.sortBy = e
+    searchParams.isAsc = false
+  }
   console.log(`排序方式: ${searchParams.sortBy}, ${searchParams.isAsc ? '升序' : '降序'}`)
   searchCommodity()
 }
 
 // 排序选项
 const sortOptions = [
-  { label: '价格', value: 'price' },
   { label: '销量', value: 'sold' },
+  { label: '价格', value: 'price' },
   { label: '评论数', value: 'comment_count' }
 ]
 
@@ -119,7 +126,6 @@ const sortOptions = [
       <a-input-search v-model:value="inputKey" enter-button @search="setKey" size="large" placeholder="搜索商品"
         style="width: 60vw; margin-top: 20px" />
     </div>
-
 
     <!--搜索条件-->
     <div class="search-condition">
@@ -147,7 +153,7 @@ const sortOptions = [
       </a-row>
 
       <!-- 价格 -->
-      <a-row class="condition-row" align="middle">
+      <!-- <a-row class="condition-row" align="middle">
         <a-col>
           <span>价格</span>
         </a-col>
@@ -156,6 +162,42 @@ const sortOptions = [
             placeholder="最低价格" style="width: 10vw;margin-right: 10px;" />
           <a-input-number v-model:value="searchParams.maxPrice" @pressEnter="searchCommodity" prefix="￥"
             placeholder="最高价格" style="width: 10vw;" />
+        </a-col>
+      </a-row> -->
+
+      <!-- 第三行 -->
+      <a-row class="condition-row" align="middle">
+        <!-- 排序条件 -->
+        <a-col>
+          <span>排序</span>
+        </a-col>
+        <a-col style="display:flex;gap:10px;">
+          <a-button v-for="sortOption in sortOptions" :key="sortOption.value" @click="toggleSort(sortOption.value)"
+            :type="searchParams.sortBy === sortOption.value ? 'primary' : 'default'">
+            {{ sortOption.label }}
+            <caret-up-filled v-if="searchParams.isAsc" />
+            <caret-down-filled v-else />
+          </a-button>
+        </a-col>
+        <a-col style="margin-left:auto;">
+          <a-row align="middle">
+            <!-- 价格区间 -->
+            <a-col>
+              <span>价格</span>
+            </a-col>
+            <a-col>
+              <a-input-number v-model:value="searchParams.minPrice" @pressEnter="searchCommodity" prefix="￥" min="0"
+                placeholder="最低价格" style="width: 10vw;margin-right: 10px;" />
+              <a-input-number v-model:value="searchParams.maxPrice" @pressEnter="searchCommodity" prefix="￥"
+                placeholder="最高价格" style="width: 10vw;margin-right: 10px;" />
+            </a-col>
+            <!-- 分页条 默认每页大小为24 -->
+            <a-col><span>共 {{ total }} 件商品</span></a-col>
+            <a-col>
+              <a-pagination v-model:current="searchParams.pageNo" @change="searchCommodity" :total="total"
+                page-size="24" simple />
+            </a-col>
+          </a-row>
         </a-col>
       </a-row>
 
@@ -172,47 +214,39 @@ const sortOptions = [
           <a-tag v-if="priceTag" closable @close="resetPrice">
             {{ priceTag }}
           </a-tag>
-
           <!-- 清空标签 -->
-          <a-tag color='red' style="cursor: pointer;" @click="resetCondition">全部清除</a-tag>
+          <a-tag color='red' style="cursor: pointer;font-size: 14px;" @click="resetCondition">清除</a-tag>
         </a-col>
       </a-row>
-
-      <!-- 排序 -->
-      <a-row class="condition-row" align="middle">
-        <a-col>
-          <span>排序</span>
-        </a-col>
-        <a-col style="display:flex;gap:10px;">
-          <a-button v-for="sortOption in sortOptions" :key="sortOption.value" @click="toggleSort(sortOption.value)"
-            :type="searchParams.sortBy === sortOption.value ? 'primary' : 'default'">
-            {{ sortOption.label }}
-            <caret-up-filled v-if="searchParams.isAsc" />
-            <caret-down-filled v-else />
-          </a-button>
-        </a-col>
-      </a-row>
-
 
     </div>
 
 
-    <!--商品展示区-->
+    <!--商品卡片展示-->
     <div class="commodity-display">
       <a-row>
         <a-col :span="4" v-for="item in commodity" :key="item.id">
-          <a-card class="commodity-card" hoverable>
+          <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
             <!-- 封面 -->
             <template #cover>
               <img :src="item.image" alt="" />
             </template>
             <a-card-meta>
+              <!-- 价格 -->
               <template #title>
                 <span class="price">￥{{ item.price }}</span>
               </template>
+              <!-- 商品描述 -->
               <template #description>
-                <span style="color: black;font-size: 12px;">{{ item.name }}</span>
+                <span class="commodity-desc">{{ item.name }}</span>
+                <div style="margin-top: 5px;">
+                  <span>已售出：{{ item.sold }}</span>
+                </div>
+                <div style="margin-top: 5px;">
+                  <span>{{ item.commentCount }}条评论</span>
+                </div>
               </template>
+
             </a-card-meta>
           </a-card>
         </a-col>
@@ -232,6 +266,11 @@ const sortOptions = [
   margin-left: 15px;
   color: @blue;
   cursor: pointer;
+}
+
+.commodity-desc {
+  color: black;
+  font-size: 12px;
 }
 
 .condition-row {

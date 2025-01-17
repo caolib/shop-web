@@ -10,13 +10,13 @@ const isLogin = ref(false)
 onMounted(() => {
   if (user) {
     isLogin.value = true
-    console.log(user)
+    // console.log(user)
   }
 })
 
 // 退出登录
 const logout = () => {
-  // todo 退出登录删除用户相关信息和token
+  //TODO 退出登录删除用户相关信息和token
   message.success('退出登录')
 }
 </script>

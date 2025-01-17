@@ -2,10 +2,16 @@ import axios from 'axios'
 import router from '@/router'
 
 import { message } from 'ant-design-vue'
+import { useUserStore } from '@/stores/userInfo'
 
 // const baseURL = 'http://localhost:8080'
 const baseURL = '/api'
 const instance = axios.create({ baseURL })
+
+// 延迟获取 store
+const getUserStore = () => {
+  return useUserStore()
+}
 
 /**
  * 响应拦截器，状态码为2xx时执行成功回调，否则执行失败回调
@@ -70,34 +76,25 @@ instance.interceptors.response.use(
  */
 instance.interceptors.request.use(
   (config) => {
-    // 检查config和config.url是否存在
-    if (!config || !config.url) {
-      return Promise.reject('config or config.url 未定义')
-    }
-
     //登录请求不需要token
     if (config.url.endsWith('/login') || config.url.endsWith('/register')) {
       return config
     }
 
-    let token = ''
+    const userInfo = getUserStore()
+    const user = userInfo.user
 
-    if (localStorage.getItem('reader') != null) {
-      // const readerStore = useReaderStore()
-      // token = readerStore.reader.token
-    } else if (localStorage.getItem('admin') != null) {
-      // const adminStore = useAdminStore()
-      // token = adminStore.admin.token
-    }
+    // 获取token
+    const token = user.token
 
-    //如果有token，将token放入请求头中
-    if (token != null) {
-      config.headers['token'] = token
-    } else {
-      router.push('/login')
+    if (user == null || token == null) {
       message.error('请先登录！')
+      router.push('/login')
       return Promise.reject('token不存在！')
     }
+
+    // 请求头设置令牌
+    config.headers['Authorization'] = token
 
     return config
   },
