@@ -21,7 +21,8 @@
                     <p class="commodity-sold"><span class="label">销量</span> {{ commodity.sold }}</p>
                     <p class="commodity-comments"><span class="label">评论</span> {{ commodity.commentCount }}</p>
                     <div class="commodity-buttons">
-                        <a-button type="primary" size="large">加入购物车</a-button>
+                        <a-button type="primary" size="large" :loading="loading"
+                            @click="addToCart(commodity)">加入购物车</a-button>
                         <a-button type="primary" size="large" style="margin-left: 10px;">立即购买</a-button>
                     </div>
                 </a-col>
@@ -30,15 +31,20 @@
     </div>
 </template>
 
-<!-- TODO 加入购物车、立即购买等功能 -->
+<!-- TODO立即购买等功能 -->
 
 <script setup>
 import { queryCommodityById } from '@/api/search'
-import { onMounted, ref } from 'vue'
+import { addCartService } from '@/api/cart'
+import { message, notification } from 'ant-design-vue'
+import { onMounted, ref, h } from 'vue'
 import { useRoute } from 'vue-router'
+import { Button } from 'ant-design-vue/es/radio'
+import router from '@/router'
 
 const route = useRoute()
 const commodity = ref(null)
+const loading = ref(false)
 
 onMounted(() => {
     // 解析路径参数id
@@ -56,7 +62,47 @@ const queryCommodity = async (id) => {
         commodity.value = res
     })
 }
+
+// 加入购物车
+const addToCart = async (commodity) => {
+    loading.value = true
+    await addCartService(commodity).then(() => {
+        loading.value = false
+        openNotification()
+    }).catch((error) => {
+        message.error('添加失败：' + error)
+    }).finally(() => {
+        loading.value = false
+    })
+}
+
+// 添加成功
+const openNotification = () => {
+    const key = `open${Date.now()}`;
+    notification.open({
+        type: 'success',
+        message: '添加成功，点击前往查看！',
+        duration: 3,
+        placement: 'topRight',
+        btn: h(
+            Button,
+            {
+                type: 'primary',
+                size: 'small',
+                onClick: () => {
+                    notification.close(key);
+                    router.push('/cart');
+                },
+            },
+            { default: () => '前往购物车结算', }
+        ),
+        key,
+    });
+};
+
 </script>
+
+
 
 <style lang="less" scoped>
 @import "@/styles/var";
@@ -88,7 +134,7 @@ const queryCommodity = async (id) => {
     color: gray;
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .commodity-price,

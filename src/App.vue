@@ -2,6 +2,8 @@
 import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import { message } from 'ant-design-vue'
+import { HomeOutlined, UserOutlined, LogoutOutlined, ShoppingCartOutlined } from '@ant-design/icons-vue'
+
 
 const userInfo = useUserStore()
 const user = userInfo.user

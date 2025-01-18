@@ -48,7 +48,6 @@ instance.interceptors.response.use(
     switch (code) {
       case 400:
         message.error(msg)
-        router.push('/login')
         break
       case 401:
         message.error('请先登录！')
@@ -59,7 +58,8 @@ instance.interceptors.response.use(
         router.push('/login')
         break
       case 500:
-        message.error(msg)
+      case 503:
+        message.error('服务器繁忙！')
         console.log(msg)
         break
       default:

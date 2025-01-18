@@ -1,10 +1,9 @@
 <script setup>
 import { onMounted, reactive, ref, computed, h } from 'vue'
-import { message } from 'ant-design-vue'
 import { searchService } from '@/api/search.js'
 import router from '@/router/index.js'
 import { jumpToItem } from '@/router/jump'
-import { CaretDownFilled, CaretUpFilled, CaretUpOutlined } from '@ant-design/icons-vue'
+import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons-vue'
 
 
 const commodity = ref([]) // 商品列表
@@ -12,7 +11,8 @@ const total = ref(0) // 商品总数
 
 // 搜索商品信息
 const searchCommodity = async () => {
-  await searchService(searchParams).then((res) => {
+  const paramsCopy = Object.assign({}, searchParams);
+  await searchService(paramsCopy).then((res) => {
     commodity.value = res.list
     total.value = res.total
     console.log(res)
@@ -135,9 +135,9 @@ const sortOptions = [
         <a-input v-model:value="inputCategory" allow-clear placeholder="输入分类" @pressEnter="setBrand(inputBrand)"
           style="width: 10vw;" />
         <div>
-          <span v-for="cate in presetCategories" :key="cate" @click="setCategory(cate)" class="comdition-row-item">{{
+          <span v-for="cate in presetCategories" :key="cate" @click="setCategory(cate)" class="condition-row-item">{{
             cate
-          }}</span>
+            }}</span>
         </div>
       </a-row>
 
@@ -147,23 +147,10 @@ const sortOptions = [
         <a-input v-model:value="inputBrand" allow-clear placeholder="输入品牌名" @pressEnter="setBrand(inputBrand)"
           style="width: 10vw;" />
         <div>
-          <span v-for="brand in presetBrands" :key="brand" @click="setBrand(brand)" class="comdition-row-item">{{ brand
+          <span v-for="brand in presetBrands" :key="brand" @click="setBrand(brand)" class="condition-row-item">{{ brand
             }}</span>
         </div>
       </a-row>
-
-      <!-- 价格 -->
-      <!-- <a-row class="condition-row" align="middle">
-        <a-col>
-          <span>价格</span>
-        </a-col>
-        <a-col>
-          <a-input-number v-model:value="searchParams.minPrice" @pressEnter="searchCommodity" prefix="￥" min="0"
-            placeholder="最低价格" style="width: 10vw;margin-right: 10px;" />
-          <a-input-number v-model:value="searchParams.maxPrice" @pressEnter="searchCommodity" prefix="￥"
-            placeholder="最高价格" style="width: 10vw;" />
-        </a-col>
-      </a-row> -->
 
       <!-- 第三行 -->
       <a-row class="condition-row" align="middle">
@@ -183,7 +170,7 @@ const sortOptions = [
           <a-row align="middle">
             <!-- 价格区间 -->
             <a-col>
-              <span>价格</span>
+              <span style="margin-right: 10px">价格</span>
             </a-col>
             <a-col>
               <a-input-number v-model:value="searchParams.minPrice" @pressEnter="searchCommodity" prefix="￥" min="0"
@@ -202,7 +189,7 @@ const sortOptions = [
       </a-row>
 
       <!-- 条件标签 -->
-      <a-row class="condition-row" align="middle">
+      <a-row class="condition-row">
         <a-col>
           <span>条件</span>
         </a-col>
@@ -221,7 +208,6 @@ const sortOptions = [
 
     </div>
 
-
     <!--商品卡片展示-->
     <div class="commodity-display">
       <a-row>
@@ -234,7 +220,7 @@ const sortOptions = [
             <a-card-meta>
               <!-- 价格 -->
               <template #title>
-                <span class="price">￥{{ item.price }}</span>
+                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
               </template>
               <!-- 商品描述 -->
               <template #description>
@@ -243,7 +229,7 @@ const sortOptions = [
                   <span>已售出：{{ item.sold }}</span>
                 </div>
                 <div style="margin-top: 5px;">
-                  <span>{{ item.commentCount }}条评论</span>
+                  <span>{{ item.commentCount }} 条评论</span>
                 </div>
               </template>
 
@@ -253,8 +239,6 @@ const sortOptions = [
       </a-row>
     </div>
 
-
-
   </div>
 </template>
 
@@ -262,7 +246,7 @@ const sortOptions = [
 @import '@/styles/var';
 
 /* 预设条件 */
-.comdition-row-item {
+.condition-row-item {
   margin-left: 15px;
   color: @blue;
   cursor: pointer;
