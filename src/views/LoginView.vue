@@ -6,6 +6,9 @@ import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import router from '@/router/index.js'
 
+// 加载中
+const spinning = ref(false)
+
 const userInfo = useUserStore() //用户信息
 // 定义表单
 const formState = reactive({
@@ -16,6 +19,7 @@ const formState = reactive({
 
 // 账号密码登录
 const onFinish = async () => {
+  spinning.value = true
   await loginService(formState).then((res) => {
     // 保存到pinia
     userInfo.setUser({
@@ -26,6 +30,7 @@ const onFinish = async () => {
       token: res.token,
     })
   })
+  spinning.value = false
   await router.push({ path: '/' })
   // 打印用户信息
   // console.log(userInfo.user)
@@ -47,6 +52,7 @@ onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search)
   const code = urlParams.get('code')
   if (code) {
+    spinning.value = true
     githubLoginService(code).then((res) => {
       // console.log(res.data)
       const data = res.data
@@ -58,6 +64,7 @@ onMounted(() => {
         avatar: data.avatar,
         token: data.token,
       })
+      spinning.value = false
       message.success('github登录成功!')
       router.push({ path: '/' })
     })
@@ -66,6 +73,7 @@ onMounted(() => {
 
 // github 登录
 const loginByGithub = async () => {
+  spinning.value = true
   // 跳转到 GitHub 授权页面
   const clientId = 'Ov23liaxpXWclT4EZOKg'
   const redirectUri = 'http://localhost:5173/login'
@@ -75,77 +83,71 @@ const loginByGithub = async () => {
 </script>
 
 <template>
-  <div class="login-body">
-    <div class="login-form">
-      <!-- 表单组件 -->
-      <a-form
-        :model="formState"
-        name="normal_login"
-        @finish="onFinish"
-        @finishFailed="onFinishFailed"
-      >
-        <!-- 用户名表单项 -->
-        <a-form-item
-          label="账号"
-          name="username"
-          :rules="[{ required: true, message: '请输入用户名!' }]"
-        >
-          <a-input v-model:value="formState.username">
-            <template #prefix>
-              <UserOutlined class="site-form-item-icon" />
-            </template>
-          </a-input>
-        </a-form-item>
-
-        <!-- 密码表单项 -->
-        <a-form-item
-          label="密码"
-          name="password"
-          :rules="[{ required: true, message: '请输入密码!' }]"
-        >
-          <a-input-password v-model:value="formState.password">
-            <template #prefix>
-              <LockOutlined class="site-form-item-icon" />
-            </template>
-          </a-input-password>
-        </a-form-item>
-
-        <!-- 记住我和忘记密码 -->
-        <a-form-item>
-          <a-form-item name="remember" no-style>
-            <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
+  <a-spin :spinning="spinning" size="large">
+    <div class="login-body">
+      <div class="login-form">
+        <!-- 表单组件 -->
+        <a-form :model="formState" name="normal_login" @finish="onFinish" @finishFailed="onFinishFailed">
+          <!-- 用户名表单项 -->
+          <a-form-item label="账号" name="username" :rules="[{ required: true, message: '请输入用户名!' }]">
+            <a-input v-model:value="formState.username">
+              <template #prefix>
+                <UserOutlined class="site-form-item-icon" />
+              </template>
+            </a-input>
           </a-form-item>
-          <a class="login-form-forgot" href="">忘记密码</a>
-        </a-form-item>
 
-        <!-- 登录按钮和注册链接 -->
-        <a-form-item>
-          <a-button
-            :disabled="disabled"
-            type="primary"
-            html-type="submit"
-            class="login-form-button"
-          >
-            登录
-          </a-button>
-          或
-          <a href="">立即注册</a>
-        </a-form-item>
+          <!-- 密码表单项 -->
+          <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入密码!' }]">
+            <a-input-password v-model:value="formState.password">
+              <template #prefix>
+                <LockOutlined class="site-form-item-icon" />
+              </template>
+            </a-input-password>
+          </a-form-item>
 
-        <!-- 社交账号登录 -->
-        <a-form-item>
-          <a-space>
-            <!--github 登录按钮-->
-            <a-button shape="circle" :icon="h(GithubFilled)" @click="loginByGithub" />
-          </a-space>
-        </a-form-item>
-      </a-form>
+          <!-- 记住我和忘记密码 -->
+          <a-form-item>
+            <a-form-item name="remember" no-style>
+              <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
+            </a-form-item>
+            <a class="login-form-forgot" href="">忘记密码</a>
+          </a-form-item>
+
+          <!-- 登录按钮和注册链接 -->
+          <a-form-item>
+            <a-button :disabled="disabled" type="primary" html-type="submit" class="login-form-button">
+              登录
+            </a-button>
+            或
+            <a href="">立即注册</a>
+          </a-form-item>
+
+          <!-- 社交账号登录 -->
+          <a-form-item>
+            <a-space>
+              <!--github 登录按钮-->
+              <a-button shape="circle" :icon="h(GithubFilled)" @click="loginByGithub" />
+            </a-space>
+          </a-form-item>
+        </a-form>
+      </div>
     </div>
-  </div>
+  </a-spin>
 </template>
 
 <style scoped lang="less">
 @import '@/styles/var';
+
+/* 背景图片 */
+.login-body {
+  height: 100vh;
+  background-image: url('../login_bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
 
 .login-body {
   display: flex;
@@ -155,8 +157,9 @@ const loginByGithub = async () => {
 
 /* 登录表单 */
 .login-form {
+  background: #fff;
   border: 1px #e8e8e8 solid;
-  margin-top: 100px;
+  margin-top: 10px;
   width: 50vw;
   display: flex;
   justify-content: center;

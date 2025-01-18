@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools({
-      launchEditor: 'webstorm',
+      // launchEditor: 'webstorm',
     }),
   ],
   resolve: {

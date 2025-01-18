@@ -1,14 +1,9 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import {
-  HomeOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  ShoppingCartOutlined,
-} from '@ant-design/icons-vue'
 import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import { message } from 'ant-design-vue'
+import { HomeOutlined, UserOutlined, LogoutOutlined, ShoppingCartOutlined } from '@ant-design/icons-vue'
+
 
 const userInfo = useUserStore()
 const user = userInfo.user
@@ -17,13 +12,13 @@ const isLogin = ref(false)
 onMounted(() => {
   if (user) {
     isLogin.value = true
-    console.log(user)
+    // console.log(user)
   }
 })
 
 // 退出登录
 const logout = () => {
-  // todo 退出登录删除用户相关信息和token
+  //TODO 退出登录删除用户相关信息和token
   message.success('退出登录')
 }
 </script>
@@ -90,7 +85,7 @@ const logout = () => {
   top: 0;
   width: 100%;
   z-index: 1000;
-  background: #fff;
+  background: #e7e7e7;
 }
 
 .route-link:hover,
