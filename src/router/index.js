@@ -7,6 +7,8 @@ import SearchView from '@/views/SearchView.vue'
 import CartView from '@/views/CartView.vue'
 import CommodityView from '@/views/CommodityView.vue'
 import OrderView from '@/views/OrderView.vue'
+import ErrorView from '@/views/ErrorView.vue'
+import OrderInfoView from '@/views/OrderInfoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +52,16 @@ const router = createRouter({
       path: '/order',
       name: 'order',
       component: OrderView,
+    },
+    {
+      path: '/error',
+      name: 'error',
+      component: ErrorView,
+    },
+    {
+      path: '/order-info',
+      name: 'order-info',
+      component: OrderInfoView,
     },
   ],
 })

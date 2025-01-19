@@ -43,8 +43,11 @@ instance.interceptors.response.use(
   },
   //失败回调
   (error) => {
+    if (config.url.endsWith('/health')) {
+      return config
+    }
     const code = error.response.status
-    const msg = error.response.msg
+    const msg = error.response.data.msg
     switch (code) {
       case 400:
         message.error(msg)
@@ -76,17 +79,17 @@ instance.interceptors.response.use(
  */
 instance.interceptors.request.use(
   (config) => {
-    //登录请求不需要token
-    if (config.url.endsWith('/login') || config.url.endsWith('/register')) {
+    const noAuthUrls = ['/login', '/register','health']
+    // 如果是不需要认证的url直接放行
+    if (noAuthUrls.some(url => config.url.endsWith(url))) {
       return config
     }
-
     const userInfo = getUserStore()
     const user = userInfo.user
 
     // 获取token
     const token = user.token
-
+    // 未登录
     if (user == null || token == null) {
       message.error('请先登录！')
       router.push('/login')

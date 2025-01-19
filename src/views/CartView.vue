@@ -5,13 +5,14 @@ import {
   getCartService,
   updateCartItemService,
 } from '@/api/cart'
-import { jumpToItem } from '@/router/jump'
+import { jump, jumpToItem } from '@/router/jump'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, ref } from 'vue'
-import router from '@/router/index.js'
+import { useOrderStore } from '@/stores/order.js'
 
-const cartData = ref([])
-const isCartEmpty = computed(() => cartData.value.length === 0)
+const cartData = ref([]) // 购物车数据
+const isCartEmpty = computed(() => cartData.value.length === 0) // 购物车是否为空
+const orderStore = useOrderStore() // 订单 store
 
 // 查询用户购物车
 const queryCart = async () => {
@@ -72,6 +73,9 @@ const rowSelection = {
     selectedIds.value = selectedRowKeys
     selectedItems.value = selectedRows
   },
+  getCheckboxProps: (record) => ({
+    disabled: record.stock === 0, // 设置 stock 为 0 的行不可选中
+  }),
 }
 
 // 删除购物车商品
@@ -144,12 +148,8 @@ const clearCart = () => {
 // 去结算
 const checkout = () => {
   console.log('去结算')
-  router.push({
-    path: '/order',
-    query: {
-      items: JSON.stringify(selectedItems.value),
-    },
-  })
+  jump('/order')
+  orderStore.setSelectedItems(selectedItems.value)
 }
 </script>
 
@@ -171,7 +171,7 @@ const checkout = () => {
 
         <!-- 商品名 -->
         <template v-if="column.dataIndex === 'name'">
-          <a style="color: black; font-size: 12px" @click="jumpToItem(record.itemId)">{{ text }}</a>
+          <a style="color: black; font-size: 12px" @click="jumpToItem(record.itemId)">{{ text }}<a-tag color="red" style="margin-left: 10px;" v-if="record.stock<=0">库存不足</a-tag></a>
         </template>
 
         <!-- 商品规格 -->
@@ -276,7 +276,7 @@ td.ant-table-cell {
 /* 操作 */
 .cart-actions {
   padding: 10px;
-  border: 1px solid #f0f0f0;
+  border: @border;
   color: gray;
   margin-top: 20px;
   display: flex;
