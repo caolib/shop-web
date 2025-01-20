@@ -80,6 +80,8 @@ instance.interceptors.response.use(
  */
 instance.interceptors.request.use(
   (config) => {
+    // console.log('baseURL:', config.baseURL)
+
     const noAuthUrls = ['/login', '/register', 'health']
     // 如果是不需要认证的url直接放行
     if (noAuthUrls.some(url => config.url.endsWith(url))) {
