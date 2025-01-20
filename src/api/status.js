@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 定义服务的健康检查端点
-const services = ['carts', 'orders', 'users', 'commodity', 'pays', 'gateway']
+const services = ['carts', 'orders', 'users', 'commodity', 'pays']
 
 // 发送请求获取健康状态并返回一个映射服务和状态的 Map 对象
 async function checkServicesHealth() {
