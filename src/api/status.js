@@ -11,7 +11,7 @@ async function checkServicesHealth() {
     await request
       .get(`/${service}/health`)
       .then((response) => {
-        // console.log(`response:`,response)
+        // console.log(`response:`, response)
         healthStatusMap.set(service, response.status)
       })
       .catch(() => {

@@ -26,7 +26,7 @@ export default defineConfig({
     proxy: {
       '/api': { //匹配请求路径中含有 /api 的请求
         // target: 'http://localhost:8080', //后端服务地址
-        target: 'https://[2409:8a38:9026:5270:6196:b252:dd6a:996]:8080', //后端服务地址
+        target: 'https://shop.caolib.us.kg', //后端服务地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '') //去除路径中的/api，还原请求路径
       }
