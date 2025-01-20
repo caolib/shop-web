@@ -5,22 +5,22 @@ import request from '@/utils/request'
  * @param commodity 商品信息
  */
 const addCartService = (commodity) => {
-    console.log(`加入购物车: ${JSON.stringify(commodity)}`)
-    const cartForm = {
-        itemId: commodity.id,
-        name: commodity.name,
-        spec: commodity.spec,
-        price: commodity.price,
-        image: commodity.image,
-    }
-    return request.post('/carts', cartForm)
+  console.log(`加入购物车: ${JSON.stringify(commodity)}`)
+  const cartForm = {
+    itemId: commodity.id,
+    name: commodity.name,
+    spec: commodity.spec,
+    price: commodity.price,
+    image: commodity.image,
+  }
+  return request.post('/carts', cartForm)
 }
 
 /**
  * 获取购物车列表
  */
 const getCartService = () => {
-    return request.get('/carts')
+  return request.get('/carts')
 }
 
 /**
@@ -29,7 +29,7 @@ const getCartService = () => {
  * @param  num 数量
  */
 const updateCartItemService = (id, num) => {
-    return request.put(`/carts/${id}/${num}`)
+  return request.put(`/carts/${id}/${num}`)
 }
 
 /**
@@ -37,16 +37,21 @@ const updateCartItemService = (id, num) => {
  * @param id 购物车条目
  */
 const deleteCartItemService = (id) => {
-    return request.delete(`/carts/${id}`)
+  return request.delete(`/carts/${id}`)
 }
-
 
 /**
  * 批量删除购物车中商品
  * @param ids 购物车条目id数组
  */
 const deleteCartItemsService = (ids) => {
-    return request.delete(`/carts/batch`, { data: ids })
+  return request.delete(`/carts/batch`, { data: ids })
 }
 
-export { addCartService, getCartService, updateCartItemService, deleteCartItemService, deleteCartItemsService };
+export {
+  addCartService,
+  getCartService,
+  updateCartItemService,
+  deleteCartItemService,
+  deleteCartItemsService,
+}

@@ -6,4 +6,8 @@ const jumpToItem = (id) => {
     router.push({ path: '/commodity', query: { id } })
 }
 
-export { jumpToItem }
+const jump = (path) => {
+    router.push({ path })
+}
+
+export { jumpToItem,jump }

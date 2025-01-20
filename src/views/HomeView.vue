@@ -1,5 +1,4 @@
 <script setup>
-import { message } from 'ant-design-vue'
 import router from '@/router/index.js'
 import {
   BgColorsOutlined,
@@ -15,7 +14,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons-vue'
 import { searchService } from '@/api/search.js'
-import { onMounted, reactive, ref, onBeforeUpdate } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { jumpToItem } from '@/router/jump'
 
 const commodity = ref([])
@@ -94,7 +93,7 @@ const handleSearchClick = () => {
           <a-col :span="6" v-for="item in commodity" :key="item.id">
             <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
               <template #cover>
-                <img :src="item.image" />
+                <img :src="item.image"  alt=""/>
               </template>
               <a-card-meta>
                 <template #title>
