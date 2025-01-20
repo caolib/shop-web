@@ -4,11 +4,10 @@ import router from '@/router'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo'
 
-// const baseURL = 'http://localhost:8080'
-const baseURL = '/api'
+const baseURL = import.meta.env.VITE_APP_BASE_API
 const instance = axios.create({ baseURL })
 
-// 延迟获取 store
+// 获取用户存储
 const getUserStore = () => {
   return useUserStore()
 }
@@ -43,9 +42,11 @@ instance.interceptors.response.use(
   },
   //失败回调
   (error) => {
-    if (config.url.endsWith('/health')) {
-      return config
+    // 如果请求路径以/health结尾，直接返回错误
+    if (error.config.url.endsWith('/health')) {
+      return Promise.reject(error)
     }
+
     const code = error.response.status
     const msg = error.response.data.msg
     switch (code) {
@@ -79,7 +80,7 @@ instance.interceptors.response.use(
  */
 instance.interceptors.request.use(
   (config) => {
-    const noAuthUrls = ['/login', '/register','health']
+    const noAuthUrls = ['/login', '/register', 'health']
     // 如果是不需要认证的url直接放行
     if (noAuthUrls.some(url => config.url.endsWith(url))) {
       return config

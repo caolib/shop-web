@@ -190,7 +190,7 @@ const getBackPassword = () => {
 /* 背景图片 */
 .login-body {
   height: 100vh;
-  background-image: url('../login_bg.png');
+  background-image: url('https://s2.loli.net/2025/01/20/Zc4OgkLGlzDdEVF.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
