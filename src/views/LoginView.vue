@@ -6,6 +6,7 @@ import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import router from '@/router/index.js'
 
+
 // 加载中
 const spinning = ref(false)
 
@@ -32,8 +33,8 @@ const onFinish = async () => {
   })
   spinning.value = false
   await router.push({ path: '/' })
-  // 打印用户信息
   // console.log(userInfo.user)
+  window.location.reload()
   message.success('登录成功!')
 }
 
@@ -74,11 +75,10 @@ onMounted(() => {
 // github 登录
 const loginByGithub = async () => {
   spinning.value = true
+  const ghAuthUrl = import.meta.env.VITE_Gh_AUTH_URL
+  console.log(ghAuthUrl)
   // 跳转到 GitHub 授权页面
-  const clientId = 'Ov23liaxpXWclT4EZOKg'
-  const redirectUri = 'http://localhost:5173/login'
-  const scope = 'read:user user:email'
-  window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}}`
+  window.location.href = ghAuthUrl
 }
 
 // 微信登录

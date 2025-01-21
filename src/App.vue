@@ -14,10 +14,14 @@ import {
 } from '@ant-design/icons-vue'
 import { checkServicesHealth } from '@/api/status.js'
 import { jump } from './router/jump'
+import { useRoute } from 'vue-router'
 
 const userInfo = useUserStore()
 const user = userInfo.user
 const isLogin = ref(false) // 是否登录
+
+const route = useRoute()
+const isActive = (path) => route.path === path
 
 const serviceStatus = ref(new Map()) // 服务状态
 const allServicesUp = computed(() => {
@@ -41,6 +45,7 @@ const logout = () => {
   userInfo.clearUser()
   jump('/login')
   onMounted()
+  window.location.reload()
   message.success('已经退出登录')
 }
 </script>
@@ -51,7 +56,7 @@ const logout = () => {
     <a-breadcrumb style="margin-left: 100px">
       <!--首页-->
       <a-breadcrumb-item>
-        <router-link to="/">
+        <router-link to="/" :class="['route-link', { active: isActive('/') }]">
           <home-outlined />
           首页
         </router-link>
@@ -59,33 +64,33 @@ const logout = () => {
 
       <!--登录-->
       <a-breadcrumb-item>
-        <router-link to="/user" class="route-link">
+        <router-link to="/user" :class="['route-link', { active: isActive('/user') }]">
           <user-outlined />
           <span v-if="isLogin"> 你好,{{ user.username }} </span>
           <span v-else>
-            <router-link to="/login" class="route-link">&nbsp;请登录 </router-link>
+            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]">&nbsp;请登录 </router-link>
           </span>
         </router-link>
       </a-breadcrumb-item>
 
       <!--注册-->
       <a-breadcrumb-item v-if="!isLogin">
-        <router-link to="" class="route-link">
+        <router-link to="/register" :class="['route-link', { active: isActive('/register') }]">
           <span>注册</span>
         </router-link>
       </a-breadcrumb-item>
 
       <!--购物车-->
       <a-breadcrumb-item>
-        <router-link to="/cart" class="route-link">
+        <router-link to="/cart" :class="['route-link', { active: isActive('/cart') }]">
           <ShoppingCartOutlined />
           购物车
         </router-link>
       </a-breadcrumb-item>
 
-      <!--购物车-->
+      <!--我的订单-->
       <a-breadcrumb-item>
-        <router-link to="/order-info" class="route-link">
+        <router-link to="/order-info" :class="['route-link', { active: isActive('/order-info') }]">
           <FileTextOutlined />
           我的订单
         </router-link>
@@ -93,7 +98,7 @@ const logout = () => {
 
       <!--搜索商品-->
       <a-breadcrumb-item>
-        <router-link to="/search" class="route-link">
+        <router-link to="/search" :class="['route-link', { active: isActive('/search') }]">
           <SearchOutlined />
           搜索商品
         </router-link>
@@ -150,5 +155,10 @@ a:hover {
 .logout:hover {
   cursor: pointer;
   color: @red;
+}
+
+.active {
+  font-weight: bold;
+  color: @primary-color !important;
 }
 </style>
