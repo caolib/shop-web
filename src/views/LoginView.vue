@@ -5,6 +5,8 @@ import { githubLoginService, loginService } from '@/api/login.js'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import router from '@/router/index.js'
+import { jump } from '@/router/jump'
+
 
 // 加载中
 const spinning = ref(false)
@@ -29,11 +31,13 @@ const onFinish = async () => {
       avatar: res.avatar,
       token: res.token,
     })
+  }).finally(() => {
+    spinning.value = false
   })
   spinning.value = false
   await router.push({ path: '/' })
-  // 打印用户信息
   // console.log(userInfo.user)
+  window.location.reload()
   message.success('登录成功!')
 }
 
@@ -65,8 +69,10 @@ onMounted(() => {
         token: data.token,
       })
       spinning.value = false
-      message.success('github登录成功!')
-      router.push({ path: '/' })
+      message.success('hello,' + data.username)
+      jump('/')
+    }).finally(() => {
+      spinning.value = false
     })
   }
 })
@@ -74,11 +80,10 @@ onMounted(() => {
 // github 登录
 const loginByGithub = async () => {
   spinning.value = true
+  const ghAuthUrl = import.meta.env.VITE_Gh_AUTH_URL
+  console.log(ghAuthUrl)
   // 跳转到 GitHub 授权页面
-  const clientId = 'Ov23liaxpXWclT4EZOKg'
-  const redirectUri = 'http://localhost:5173/login'
-  const scope = 'read:user user:email'
-  window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}}`
+  window.location.href = ghAuthUrl
 }
 
 // 微信登录
@@ -141,7 +146,8 @@ const getBackPassword = () => {
 
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
-            <a-button :disabled="disabled" type="primary" html-type="submit" class="login-form-button">
+            <a-button :disabled="disabled" :loading="spinning" type="primary" html-type="submit"
+              class="login-form-button">
               登录
             </a-button>
             或

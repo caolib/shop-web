@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/userInfo'
 const baseURL = import.meta.env.VITE_APP_BASE_API
 const instance = axios.create({ baseURL })
 
+
 // 获取用户存储
 const getUserStore = () => {
   return useUserStore()
@@ -21,22 +22,18 @@ instance.interceptors.response.use(
     // 如果状态码为200
     const code = result.data.code
     const msg = result.data.msg
-    if (code === 200 || code === undefined) return result.data
+    if (code === undefined || code === 200 || code >= 1000) return result.data
     // 异常处理
-    switch (code) {
-      case 400:
-        message.error(msg)
-        break
-      case 401:
-        message.error('请先登录！')
-        router.push('/login')
-        break
-      case 500:
-        message.error(msg)
-        console.log(msg)
-        break
-      default:
-        message.error('未知异常！' + code)
+    if (code === 400) {
+      message.error(msg);
+    } else if (code === 401) {
+      message.error('请先登录！');
+      router.push('/login');
+    } else if (code === 500) {
+      message.error(msg);
+      console.log(msg);
+    } else {
+      message.error('未知异常！' + code);
     }
     return Promise.reject(result)
   },
@@ -56,6 +53,9 @@ instance.interceptors.response.use(
       case 401:
         message.error('请先登录！')
         router.push('/login')
+        break
+      case 403:
+        message.error('禁止访问！')
         break
       case 499:
         message.error('身份过期,请重新登录！')
@@ -80,6 +80,8 @@ instance.interceptors.response.use(
  */
 instance.interceptors.request.use(
   (config) => {
+    // console.log('baseURL:', config.baseURL)
+
     const noAuthUrls = ['/login', '/register', 'health']
     // 如果是不需要认证的url直接放行
     if (noAuthUrls.some(url => config.url.endsWith(url))) {
