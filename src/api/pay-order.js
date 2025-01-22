@@ -1,9 +1,11 @@
 import request from '@/utils/request.js'
 
-
-const getPayOrderService = ()=>{
+// TODO
+const getPayOrderService = () => {
   return request.get('/pays')
 }
+
+
 
 export {
   getPayOrderService

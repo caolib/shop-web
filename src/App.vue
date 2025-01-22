@@ -15,10 +15,11 @@ import {
 import { checkServicesHealth } from '@/api/status.js'
 import { jump } from './router/jump'
 import { useRoute } from 'vue-router'
+import router from './router'
 
 const userInfo = useUserStore()
 const user = userInfo.user
-const isLogin = ref(false) // 是否登录
+const isLogin = ref(false) // 是否已登录
 
 const route = useRoute()
 const isActive = (path) => route.path === path
@@ -36,7 +37,7 @@ const getServiceStatus = async () => {
 onMounted(() => {
   if (user.token != '') isLogin.value = true
   getServiceStatus()
-  const intervalId = setInterval(getServiceStatus, 60000) // 10s执行一次
+  const intervalId = setInterval(getServiceStatus, 60000) // 60s执行一次
   onUnmounted(() => clearInterval(intervalId))
 })
 // 退出登录
@@ -44,9 +45,8 @@ const logout = () => {
   //TODO 退出登录后端删除用户相关信息和token
   userInfo.clearUser()
   jump('/login')
-  onMounted()
-  window.location.reload()
-  message.success('已经退出登录')
+  isLogin.value = false;
+  message.success('已退出登录')
 }
 </script>
 
@@ -158,7 +158,6 @@ a:hover {
 }
 
 .active {
-  font-weight: bold;
   color: @primary-color !important;
 }
 </style>

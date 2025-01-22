@@ -4,16 +4,13 @@
 
     <!-- 收货地址列表 -->
     <div class="address-list" v-if="addresses.length > 0">
-      <div><h3>收货人信息</h3></div>
+      <div>
+        <h3>收货人信息</h3>
+      </div>
       <a-list>
         <!--地址行-->
-        <a-list-item
-          class="address-row"
-          v-for="address in addresses"
-          :key="address.id"
-          @click="selectAddress(address)"
-          :class="{ selected: address.id === selectedAddress.id }"
-        >
+        <a-list-item class="address-row" v-for="address in addresses" :key="address.id" @click="selectAddress(address)"
+          :class="{ selected: address.id === selectedAddress.id }">
           <!--地址信息-->
           <div class="address-info">
             <div>
@@ -24,27 +21,12 @@
             </div>
             <!--地址操作-->
             <div class="address-actions">
-              <a-button
-                type="link"
-                size="small"
-                class="actions-btn"
-                v-if="!address.isDefault"
-                @click.stop="setDefaultAddress(address)"
-                >设为默认地址
+              <a-button type="link" size="small" class="actions-btn" v-if="!address.isDefault"
+                @click.stop="setDefaultAddress(address)">设为默认地址
               </a-button>
-              <a-button
-                type="link"
-                size="small"
-                class="actions-btn"
-                @click.stop="editAddress(address)"
-                >编辑
+              <a-button type="link" size="small" class="actions-btn" @click.stop="editAddress(address)">编辑
               </a-button>
-              <a-button
-                type="link"
-                size="small"
-                class="actions-btn"
-                @click.stop="deleteAddress(address)"
-                >删除
+              <a-button type="link" size="small" class="actions-btn" @click.stop="deleteAddress(address)">删除
               </a-button>
             </div>
           </div>
@@ -58,7 +40,9 @@
           <a-card class="commodity-card" hoverable @click="jumpToItem(item.itemId)">
             <!-- 封面 -->
             <template #cover>
-              <img :src="item.image" style="width: 100px" alt="" />
+              <div style="display: flex;justify-content: center;margin-top: 5px;">
+                <img :src="item.image" style="width: 100px" alt="" />
+              </div>
             </template>
             <a-card-meta>
               <!-- 价格 -->
@@ -89,7 +73,7 @@
       <!--选择的地址信息行-->
       <a-row style="margin-top: 10px">
         <a-col :span="20" style="color: grey">
-          <div v-if="selectedAddress" style="display: flex; gap: 10px; font-size: 12px">
+          <div v-if="selectedAddress" style="display: flex; gap: 10px; font-size: 12px;color:black">
             寄送至：
             <span>{{ selectedAddress.contact }}</span>
             <span>{{ selectedAddress.province }}</span>
@@ -100,8 +84,7 @@
           </div>
         </a-col>
         <a-col :span="4">
-          <a-button type="primary" size="large" :loading="loading" @click="submitOrder"
-            >提交订单
+          <a-button type="primary" size="large" :loading="loading" @click="submitOrder">提交订单
           </a-button>
         </a-col>
       </a-row>
@@ -113,7 +96,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useOrderStore } from '@/stores/order.js'
 import { getAddressService } from '@/api/address.js'
-import { jump, jumpToItem } from '@/router/jump.js'
+import { jumpToItem, jumpToPay } from '@/router/jump.js'
 import { createOrderService } from '@/api/order.js'
 import { message } from 'ant-design-vue'
 
@@ -181,12 +164,13 @@ const submitOrder = async () => {
     paymentType: 3, // 假设支付类型为1
     details: orderDetails,
   }
-
+  // 创建订单
   await createOrderService(orderForm)
-    .then(() => {
-      message.success('订单提交成功')
+    .then((res) => {
+      console.log('订单号:', res)
+      message.success('订单创建成功')
       orderStore.clearSelectedItems() // 清除选择的商品信息
-      jump('/order-info')// 跳转到订单列表页
+      jumpToPay(res)// 跳转到订单列表页
     })
     .finally(() => {
       loading.value = false
@@ -216,6 +200,7 @@ const submitOrder = async () => {
 }
 
 .address-row.selected {
+  color: clack;
   background-color: @light-primary-color;
 }
 
@@ -254,5 +239,9 @@ const submitOrder = async () => {
 
 .order-footer {
   border: @border;
+}
+
+.commodity-card {
+  margin: 10px
 }
 </style>

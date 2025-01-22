@@ -147,7 +147,7 @@ const clearCart = () => {
 
 // 去结算
 const checkout = () => {
-  console.log('去结算')
+  // console.log('去结算')
   jump('/order')
   orderStore.setSelectedItems(selectedItems.value)
 }
@@ -156,13 +156,7 @@ const checkout = () => {
 <template>
   <div class="cart-view">
     <!-- 购物车表格 -->
-    <a-table
-      :row-selection="rowSelection"
-      :columns="columns"
-      :data-source="cartData"
-      :pagination="false"
-      rowKey="id"
-    >
+    <a-table :row-selection="rowSelection" :columns="columns" :data-source="cartData" :pagination="false" rowKey="id">
       <template #bodyCell="{ column, text, record }">
         <!-- 商品图片 -->
         <template v-if="column.dataIndex === 'image'">
@@ -171,7 +165,8 @@ const checkout = () => {
 
         <!-- 商品名 -->
         <template v-if="column.dataIndex === 'name'">
-          <a style="color: black; font-size: 12px" @click="jumpToItem(record.itemId)">{{ text }}<a-tag color="red" style="margin-left: 10px;" v-if="record.stock<=0">库存不足</a-tag></a>
+          <a class="item-name" @click="jumpToItem(record.itemId)">{{ text }}<a-tag color="red"
+              style="margin-left: 10px;" v-if="record.stock <= 0">库存不足</a-tag></a>
         </template>
 
         <!-- 商品规格 -->
@@ -186,8 +181,7 @@ const checkout = () => {
           <div>
             <template v-if="record.newPrice !== null && record.newPrice < record.price">
               <span style="text-decoration: line-through">
-                ¥{{ (record.price / 100).toFixed(2) }}</span
-              ><br />
+                ¥{{ (record.price / 100).toFixed(2) }}</span><br />
               <span>¥{{ (record.newPrice / 100).toFixed(2) }}</span>
             </template>
             <template v-else-if="record.newPrice !== null">
@@ -201,21 +195,13 @@ const checkout = () => {
 
         <!-- 数量 -->
         <template v-if="column.key === 'num'">
-          <a-input-number
-            :min="1"
-            :value="record.num"
-            @change="(value) => updateItemNum(record.id, value, record.stock)"
-          />
+          <a-input-number :min="1" :value="record.num"
+            @change="(value) => updateItemNum(record.id, value, record.stock)" />
         </template>
 
         <!-- 操作 -->
         <template v-if="column.key === 'action'">
-          <a-popconfirm
-            title="确定从购物车删除这个商品吗？"
-            ok-text="确定"
-            cancel-text="取消"
-            @confirm="removeItem(record.id)"
-          >
+          <a-popconfirm title="确定从购物车删除这个商品吗？" ok-text="确定" cancel-text="取消" @confirm="removeItem(record.id)">
             <a-button type="text" size="small">删除</a-button>
           </a-popconfirm>
         </template>
@@ -225,20 +211,10 @@ const checkout = () => {
     <!-- 操作按钮 -->
     <div class="cart-actions">
       <div class="left-actions">
-        <a-popconfirm
-          title="确定删除?"
-          ok-text="确定"
-          cancel-text="取消"
-          @confirm="removeSelectedItems"
-        >
+        <a-popconfirm title="确定删除?" ok-text="确定" cancel-text="取消" @confirm="removeSelectedItems">
           <span class="actions">删除选中商品</span>
         </a-popconfirm>
-        <a-popconfirm
-          title="确定清空购物车?"
-          ok-text="确定"
-          cancel-text="取消"
-          @confirm="clearCart"
-        >
+        <a-popconfirm title="确定清空购物车?" ok-text="确定" cancel-text="取消" @confirm="clearCart">
           <span class="actions">清空购物车</span>
         </a-popconfirm>
         <router-link v-if="isCartEmpty" to="/search">
@@ -299,5 +275,19 @@ td.ant-table-cell {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.total-price {
+  color: @red;
+}
+
+/* 商品名 */
+.item-name {
+  color: black;
+  font-size: 12px;
+}
+
+.item-name:hover {
+  color: @primary-color;
 }
 </style>

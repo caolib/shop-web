@@ -5,6 +5,7 @@ import { githubLoginService, loginService } from '@/api/login.js'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import router from '@/router/index.js'
+import { jump } from '@/router/jump'
 
 
 // 加载中
@@ -30,6 +31,8 @@ const onFinish = async () => {
       avatar: res.avatar,
       token: res.token,
     })
+  }).finally(() => {
+    spinning.value = false
   })
   spinning.value = false
   await router.push({ path: '/' })
@@ -66,8 +69,10 @@ onMounted(() => {
         token: data.token,
       })
       spinning.value = false
-      message.success('github登录成功!')
-      router.push({ path: '/' })
+      message.success('hello,' + data.username)
+      jump('/')
+    }).finally(() => {
+      spinning.value = false
     })
   }
 })
@@ -141,7 +146,8 @@ const getBackPassword = () => {
 
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
-            <a-button :disabled="disabled" type="primary" html-type="submit" class="login-form-button">
+            <a-button :disabled="disabled" :loading="spinning" type="primary" html-type="submit"
+              class="login-form-button">
               登录
             </a-button>
             或
