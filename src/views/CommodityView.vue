@@ -69,8 +69,6 @@ const addToCart = async (commodity) => {
     await addCartService(commodity).then(() => {
         loading.value = false
         openNotification()
-    }).catch((error) => {
-        message.error('添加失败：' + error)
     }).finally(() => {
         loading.value = false
     })

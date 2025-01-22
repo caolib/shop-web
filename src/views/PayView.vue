@@ -64,7 +64,6 @@ const createPayOrder = async () => {
     // 创建支付订单
     await createPayOrderService(form).then((res) => {
         payOrder.value = res.data;
-        paySuccess.value = true
         console.log('支付单：', payOrder.value)
     })
 }
@@ -73,6 +72,7 @@ const createPayOrder = async () => {
 const pay = async () => {
     payService(payOrder.value.id, password.value).then(() => {
         message.success('支付成功')
+        paySuccess.value = true
     })
 }
 </script>
@@ -143,9 +143,13 @@ const pay = async () => {
     height: 70vh;
 }
 
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+    display: none;
+}
+
 html,
 body {
-    width: 100%;
-    height: 90%;
+    overflow: hidden;
 }
 </style>
