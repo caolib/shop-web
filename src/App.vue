@@ -15,23 +15,35 @@ import {
 import { checkServicesHealth } from '@/api/status.js'
 import { jump } from './router/jump'
 import { useRoute } from 'vue-router'
-import router from './router'
+import { checkService } from '@/api/status.js'
+
 
 const userInfo = useUserStore()
 const user = userInfo.user
-const isLogin = ref(false) // 是否已登录
+const isLogin = ref(false) // 用户是否已登录
 
 const route = useRoute()
-const isActive = (path) => route.path === path
+const isActive = (path) => route.path === path // 判断当前显示的页面
 
 const serviceStatus = ref(new Map()) // 服务状态
+// 所有服务是否正常
 const allServicesUp = computed(() => {
-  return Array.from(serviceStatus.value.values()).every((status) => status === 'UP')
+  return Array.from(serviceStatus.value.values()).every((status) => status)
 })
+
 // 获取服务状态
 const getServiceStatus = async () => {
   serviceStatus.value = await checkServicesHealth()
-  // console.log('serviceStatus', serviceStatus.value)
+}
+
+// 检查服务状态
+const checkSrv = async (service) => {
+  const status = await checkService(service)
+  if (status) {
+    message.success(`${service} 服务正常`)
+  } else {
+    message.error(`${service} 服务异常`)
+  }
 }
 
 onMounted(() => {
@@ -42,7 +54,7 @@ onMounted(() => {
 })
 // 退出登录
 const logout = () => {
-  //TODO 退出登录后端删除用户相关信息和token
+  //TODO 退出登录，后端删除用户相关信息和token
   userInfo.clearUser()
   jump('/login')
   isLogin.value = false;
@@ -118,7 +130,8 @@ const logout = () => {
           <template #overlay>
             <a-menu>
               <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
-                <span :style="{ color: status[1] === 'UP' ? '#00b96b' : '#f30213' }">{{ status[0] }}</span>
+                <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{ status[0]
+                  }}</span>
               </a-menu-item>
             </a-menu>
           </template>
