@@ -24,8 +24,7 @@ const checkService = (service) => {
   return request.get(`/${service}/health`)
     .then((response) => {
       if (response.status === 'UP') return true;
-    })
-    .catch(() => { return 'error' })
+    }).catch(() => { return false })
 }
 
 

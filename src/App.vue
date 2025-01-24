@@ -31,19 +31,15 @@ const allServicesUp = computed(() => {
   return Array.from(serviceStatus.value.values()).every((status) => status)
 })
 
-// 获取服务状态
+// 获取所有服务状态
 const getServiceStatus = async () => {
   serviceStatus.value = await checkServicesHealth()
 }
 
-// 检查服务状态
+// 检查单个服务状态
 const checkSrv = async (service) => {
-  const status = await checkService(service)
-  if (status) {
-    message.success(`${service} 服务正常`)
-  } else {
-    message.error(`${service} 服务异常`)
-  }
+  const status = await checkService(service);
+  message[status ? 'success' : 'error'](`${service} 服务${status ? '正常' : '异常'}`)
 }
 
 onMounted(() => {

@@ -147,7 +147,10 @@ const clearCart = () => {
 
 // 去结算
 const checkout = () => {
-  // console.log('去结算')
+  if (selectedItems.value.length === 0) {
+    message.error('请选择要结算的商品')
+    return
+  }
   jump('/order')
   orderStore.setSelectedItems(selectedItems.value)
 }

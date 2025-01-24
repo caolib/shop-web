@@ -63,6 +63,10 @@ const createPayOrder = async () => {
     }
     // 创建支付订单
     await createPayOrderService(form).then((res) => {
+        if (res.code === 1001) {
+            paySuccess.value = true
+            message.success('订单已支付')
+        }
         payOrder.value = res.data;
         console.log('支付单：', payOrder.value)
     })
@@ -70,9 +74,11 @@ const createPayOrder = async () => {
 
 // 余额支付
 const pay = async () => {
-    payService(payOrder.value.id, password.value).then(() => {
-        message.success('支付成功')
-        paySuccess.value = true
+    await payService(payOrder.value.id, password.value).then(res => {
+        if (res.code === 200) {
+            message.success('支付成功')
+            paySuccess.value = true
+        }
     })
 }
 </script>
