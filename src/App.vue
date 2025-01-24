@@ -83,7 +83,7 @@ const logout = () => {
 
       <!--注册-->
       <a-breadcrumb-item v-if="!isLogin">
-        <router-link to="/register" :class="['route-link', { active: isActive('/register') }]">
+        <router-link to="" :class="['route-link']">
           <span>注册</span>
         </router-link>
       </a-breadcrumb-item>

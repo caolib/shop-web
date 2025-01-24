@@ -23,14 +23,16 @@ const getUser = async () => {
 </script>
 
 <template>
-  <div>
-    <div>
+  <div class="container">
+    <!-- 用户信息 -->
+    <div class="user-info">
       <a-card hoverable style="width: 300px">
         <template #actions>
           <edit-outlined key="edit" />
         </template>
-
+        <!-- 用户名 -->
         <a-card-meta :title="user.username">
+          <!-- 头像 -->
           <template #avatar>
             <a-avatar style="margin-bottom: 20px;" :src="avatar_url" />
           </template>
@@ -39,12 +41,35 @@ const getUser = async () => {
         <p>电话: {{ user.phone }}</p>
         <p>余额: {{ (user.balance / 100).toFixed(2) }} 元</p>
         <p v-if="user.provider === 'github'">已绑定：
-          <GithubFilled />{{ user.oauth_name }}
+          <GithubFilled style="margin-right: 10px;" />{{ user.oauth_name }}
         </p>
 
       </a-card>
     </div>
+
+    <!-- 订单信息 -->
+    <div class="order-info">
+      订单信息
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style lang="less" scoped>
+@import '@/styles/var';
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px !important;
+}
+
+.user-info {
+  width: 300px;
+  /* 确保 user-info 容器的宽度与 a-card 一致 */
+}
+
+.order-info {
+  flex: 1;
+  margin-left: 20px;
+}
+</style>
