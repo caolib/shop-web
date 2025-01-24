@@ -15,4 +15,16 @@ const githubLoginService = (code) => {
   return request.get(`/oauth/github?code=${code}`, { timeout: 5000 })
 }
 
-export { loginService, githubLoginService }
+/**
+ * 用户注册
+ * @param user 用户信息 {username, password,phone}
+ */
+const registerService = (user) => {
+  return request.post('/users/register', user)
+}
+
+export {
+  loginService,
+  githubLoginService,
+  registerService
+}

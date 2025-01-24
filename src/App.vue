@@ -97,12 +97,12 @@ const logout = () => {
       </a-breadcrumb-item>
 
       <!--我的订单-->
-      <a-breadcrumb-item>
+      <!-- <a-breadcrumb-item>
         <router-link to="/order-info" :class="['route-link', { active: isActive('/order-info') }]">
           <FileTextOutlined />
           我的订单
         </router-link>
-      </a-breadcrumb-item>
+      </a-breadcrumb-item> -->
 
       <!--搜索商品-->
       <a-breadcrumb-item>

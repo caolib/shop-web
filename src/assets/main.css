@@ -1,6 +1,21 @@
+@font-face {
+    font-family: 'Cascadia Code';
+    src: url('@/assets/fonts/CascadiaCode.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: '喵字果汁体';
+    src: url('@/assets/fonts/MiaoZi-GuoZhiTi.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* 字体 */
 div,
 span,
+input,
 body {
-    font-family: "Cascadia Code", 喵字果汁体, -apple-system, 微软雅黑, system-ui, sans-serif !important;
+    font-family: "Cascadia Code", '喵字果汁体', -apple-system, 微软雅黑, system-ui, sans-serif !important;
 }

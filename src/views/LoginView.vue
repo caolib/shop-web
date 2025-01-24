@@ -1,23 +1,42 @@
 <script setup>
 import { reactive, computed, h, onMounted, ref } from 'vue'
-import { UserOutlined, LockOutlined, GithubFilled, GitlabFilled, WechatFilled, QqCircleFilled } from '@ant-design/icons-vue'
-import { githubLoginService, loginService } from '@/api/login.js'
+import { UserOutlined, LockOutlined, GithubFilled, GitlabFilled, WechatFilled, QqCircleFilled, PhoneOutlined } from '@ant-design/icons-vue'
+import { githubLoginService, loginService, registerService } from '@/api/login.js'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo.js'
 import router from '@/router/index.js'
 import { jump } from '@/router/jump'
+import { validateUsername, validatePassword, validatePhone } from '@/utils/validation.js'
+
+const isRegister = ref(true) //TODO 改回false 是否是注册页面
 
 
 // 加载中
 const spinning = ref(false)
+const registerSpinning = ref(false);
 
 const userInfo = useUserStore() //用户信息
-// 定义表单
+// 登录表单
 const formState = reactive({
   username: '',
   password: '',
-  remember: true,
 })
+
+// 注册表单
+const registerForm = reactive({
+  username: '',
+  password: '',
+  phone: '',
+})
+
+// 用户注册
+const register = async () => {
+  console.log(registerForm)
+  await registerService(registerForm).then((res) => {
+    message.success('注册成功!')
+    isRegister.value = false
+  })
+}
 
 // 账号密码登录
 const onFinish = async () => {
@@ -41,14 +60,15 @@ const onFinish = async () => {
   message.success('登录成功!')
 }
 
-// 表单提交失败时的处理函数
-const onFinishFailed = (errorInfo) => {
-  message.error('失败:', errorInfo)
-}
 
-// 计算属性，判断表单是否禁用
+// 判断登录表单是否禁用
 const disabled = computed(() => {
   return !(formState.username && formState.password)
+})
+
+// 判断注册表单是否禁用
+const disabled2 = computed(() => {
+  return !(registerForm.username && registerForm.password && registerForm.phone)
 })
 
 onMounted(() => {
@@ -110,14 +130,20 @@ const getBackPassword = () => {
   message.info('暂不支持找回密码')
 }
 
+
 </script>
 
 <template>
   <a-spin :spinning="spinning" size="large">
     <div class="login-body">
       <div class="login-form">
-        <!-- 表单组件 -->
-        <a-form :model="formState" name="normal_login" @finish="onFinish" @finishFailed="onFinishFailed">
+        <!-- 登录表单 -->
+        <a-form v-if="!isRegister" :model="formState" name="normal_login" @finish="onFinish">
+          <div class="form-header">
+            <h2 class="form-title" @click="isRegister = false"><a>登录</a></h2>
+            <h2 class="form-title" @click="isRegister = true"><a>注册</a></h2>
+          </div>
+
           <!-- 用户名表单项 -->
           <a-form-item label="账号" name="username" :rules="[{ required: true, message: '请输入用户名!' }]">
             <a-input v-model:value="formState.username">
@@ -136,14 +162,6 @@ const getBackPassword = () => {
             </a-input-password>
           </a-form-item>
 
-          <!-- 记住我和忘记密码 -->
-          <a-form-item>
-            <a-form-item name="remember" no-style>
-              <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
-            </a-form-item>
-            <a class="login-form-forgot" @click="getBackPassword" href="">忘记密码</a>
-          </a-form-item>
-
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
             <a-button :disabled="disabled" :loading="spinning" type="primary" html-type="submit"
@@ -151,7 +169,7 @@ const getBackPassword = () => {
               登录
             </a-button>
             或
-            <a href="">立即注册</a>
+            <a @click="() => { isRegister = true }">立即注册</a>
           </a-form-item>
 
           <!-- 社交账号登录 -->
@@ -185,6 +203,53 @@ const getBackPassword = () => {
 
         </a-form>
 
+        <!-- 注册表单 -->
+        <a-form v-else :model="registerForm" name="normal_register" @finish="register">
+          <div class="form-header">
+            <h2 class="form-title" @click="isRegister = false"><a>登录</a></h2>
+            <h2 class="form-title" @click="isRegister = true"><a>注册</a></h2>
+          </div>
+          <!-- 用户名表单项 -->
+          <a-form-item label="账号" name="username"
+            :rules="[{ required: true, message: '请输入用户名!' }, { validator: validateUsername }]">
+            <a-input v-model:value="registerForm.username" @blur="() => validateUsername(null, registerForm.username)">
+              <template #prefix>
+                <UserOutlined class="site-form-item-icon" />
+              </template>
+            </a-input>
+          </a-form-item>
+
+          <!-- 密码表单项 -->
+          <a-form-item label="密码" name="password"
+            :rules="[{ required: true, message: '请输入密码!' }, { validator: validatePassword }]">
+            <a-input-password v-model:value="registerForm.password"
+              @blur="() => validatePassword(null, registerForm.password)">
+              <template #prefix>
+                <LockOutlined class="site-form-item-icon" />
+              </template>
+            </a-input-password>
+          </a-form-item>
+
+          <!-- 电话 -->
+          <a-form-item label="电话" name="phone"
+            :rules="[{ required: true, message: '请输入电话!' }, { validator: validatePhone }]">
+            <a-input v-model:value="registerForm.phone" :maxlength="11"
+              @blur="() => validatePhone(null, registerForm.phone)">
+              <template #prefix>
+                <PhoneOutlined class="site-form-item-icon" />
+              </template>
+            </a-input>
+          </a-form-item>
+
+          <!-- 登录按钮和注册链接 -->
+          <a-form-item>
+            <a-button :disabled="disabled2" :loading="registerSpinning" type="primary" html-type="submit"
+              class="login-form-button">
+              注册
+            </a-button>
+          </a-form-item>
+        </a-form>
+
       </div>
     </div>
   </a-spin>
@@ -209,17 +274,30 @@ const getBackPassword = () => {
   align-items: center;
 }
 
+.form-header {
+  display: flex;
+  justify-content: center;
+}
+
+.form-title {
+  cursor: pointer;
+  margin: 10px 10px;
+}
+
+.form-title:hover {
+  color: @primary-color;
+}
+
 /* 登录表单 */
 .login-form {
   background: #fff;
   border: 1px #e8e8e8 solid;
   margin-top: 10px;
-  width: 40vw;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 10px;
-  padding: 50px;
+  padding: 30px 50px;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
 }
 
