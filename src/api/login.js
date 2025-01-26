@@ -1,4 +1,8 @@
 import request from '@/utils/request'
+import { useUserStore } from '@/stores/userInfo.js'
+import { jump } from '@/router/jump'
+import { message } from 'ant-design-vue'
+
 
 /**
  * 用户登录
@@ -12,7 +16,7 @@ const loginService = (user) => {
  */
 const githubLoginService = (code) => {
   // 获取 URL 中的授权码 code
-  return request.get(`/oauth/github?code=${code}`, { timeout: 5000 })
+  return request.get(`/oauth/github?code=${code}`, { timeout: 10000 })
 }
 
 /**
@@ -23,8 +27,27 @@ const registerService = (user) => {
   return request.post('/users/register', user)
 }
 
+/**
+ * 注销账号
+ */
+const cancelAccountServicce = () => {
+  return request.delete('/users')
+}
+
+
+
+// 退出登录
+const logout = () => {
+  //TODO 退出登录，后端删除用户相关信息和token
+  const userInfo = useUserStore()
+  userInfo.clearUser()
+  jump('/login')
+}
+
 export {
   loginService,
   githubLoginService,
-  registerService
+  registerService,
+  cancelAccountServicce,
+  logout
 }

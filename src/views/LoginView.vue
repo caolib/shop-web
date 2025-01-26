@@ -8,7 +8,7 @@ import router from '@/router/index.js'
 import { jump } from '@/router/jump'
 import { validateUsername, validatePassword, validatePhone } from '@/utils/validation.js'
 
-const isRegister = ref(true) //TODO 改回false 是否是注册页面
+const isRegister = ref(false)
 
 
 // 加载中
@@ -54,9 +54,8 @@ const onFinish = async () => {
     spinning.value = false
   })
   spinning.value = false
-  await router.push({ path: '/' })
-  // console.log(userInfo.user)
   window.location.reload()
+  await router.push({ path: '/' }).then(() => { window.location.reload() })
   message.success('登录成功!')
 }
 
@@ -77,7 +76,7 @@ onMounted(() => {
   const code = urlParams.get('code')
   if (code) {
     spinning.value = true
-    githubLoginService(code).then((res) => {
+    githubLoginService(code).then(async (res) => {
       // console.log(res.data)
       const data = res.data
       // 保存到pinia
@@ -89,8 +88,8 @@ onMounted(() => {
         token: data.token,
       })
       spinning.value = false
-      message.success('hello,' + data.username)
-      jump('/')
+      // 跳转到首页并刷新页面
+      await router.push({ path: '/' }).then(() => window.location.reload())
     }).finally(() => {
       spinning.value = false
     })
@@ -140,7 +139,7 @@ const getBackPassword = () => {
         <!-- 登录表单 -->
         <a-form v-if="!isRegister" :model="formState" name="normal_login" @finish="onFinish">
           <div class="form-header">
-            <h2 class="form-title" @click="isRegister = false"><a>登录</a></h2>
+            <h2 class="form-title">登录</h2>
             <h2 class="form-title" @click="isRegister = true"><a>注册</a></h2>
           </div>
 
@@ -207,7 +206,7 @@ const getBackPassword = () => {
         <a-form v-else :model="registerForm" name="normal_register" @finish="register">
           <div class="form-header">
             <h2 class="form-title" @click="isRegister = false"><a>登录</a></h2>
-            <h2 class="form-title" @click="isRegister = true"><a>注册</a></h2>
+            <h2 class="form-title">注册</h2>
           </div>
           <!-- 用户名表单项 -->
           <a-form-item label="账号" name="username"

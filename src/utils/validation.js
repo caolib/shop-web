@@ -6,6 +6,7 @@ const validateUsername = (_, value) => {
 };
 
 const validatePassword = (_, value) => {
+  console.log(value);
   if (value.length < 6) {
     return Promise.reject('密码至少为6位');
   }

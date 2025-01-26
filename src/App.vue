@@ -16,6 +16,7 @@ import { checkServicesHealth } from '@/api/status.js'
 import { jump } from './router/jump'
 import { useRoute } from 'vue-router'
 import { checkService } from '@/api/status.js'
+import { logout } from '@/api/login.js'
 
 
 const userInfo = useUserStore()
@@ -49,12 +50,10 @@ onMounted(() => {
   onUnmounted(() => clearInterval(intervalId))
 })
 // 退出登录
-const logout = () => {
-  //TODO 退出登录，后端删除用户相关信息和token
-  userInfo.clearUser()
-  jump('/login')
-  isLogin.value = false;
+const userLogout = () => {
+  logout()
   message.success('已退出登录')
+  isLogin.value = false
 }
 </script>
 
@@ -97,12 +96,12 @@ const logout = () => {
       </a-breadcrumb-item>
 
       <!--我的订单-->
-      <!-- <a-breadcrumb-item>
-        <router-link to="/order-info" :class="['route-link', { active: isActive('/order-info') }]">
+      <a-breadcrumb-item>
+        <router-link to="/order-list" :class="['route-link', { active: isActive('/order-list') }]">
           <FileTextOutlined />
           我的订单
         </router-link>
-      </a-breadcrumb-item> -->
+      </a-breadcrumb-item>
 
       <!--搜索商品-->
       <a-breadcrumb-item>
@@ -113,7 +112,7 @@ const logout = () => {
       </a-breadcrumb-item>
 
       <!--退出登录-->
-      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout">
+      <a-breadcrumb-item v-if="isLogin" class="logout" @click="userLogout">
         <LogoutOutlined />
         退出登录
       </a-breadcrumb-item>
