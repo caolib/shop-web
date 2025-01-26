@@ -147,7 +147,10 @@ const clearCart = () => {
 
 // 去结算
 const checkout = () => {
-  // console.log('去结算')
+  if (selectedItems.value.length === 0) {
+    message.error('请选择要结算的商品')
+    return
+  }
   jump('/order')
   orderStore.setSelectedItems(selectedItems.value)
 }
@@ -171,9 +174,14 @@ const checkout = () => {
 
         <!-- 商品规格 -->
         <template v-if="column.dataIndex === 'spec'">
-          <span v-for="(value, key) in JSON.parse(text)" :key="key">
-            <a-tag style="font-size: 12px; margin-left: 10px">{{ value }}</a-tag>
-          </span>
+          <template v-if="text && text !== '{}'">
+            <span v-for="(value, key) in JSON.parse(text)" :key="key">
+              <a-tag style="font-size: 12px; margin-left: 10px">{{ value }}</a-tag>
+            </span>
+          </template>
+          <template v-else>
+            <span></span>
+          </template>
         </template>
 
         <!-- 单价,单位为分 -->
@@ -218,7 +226,7 @@ const checkout = () => {
           <span class="actions">清空购物车</span>
         </a-popconfirm>
         <router-link v-if="isCartEmpty" to="/search">
-          <span class="actions">购物车是空的，去买点东西吧!</span>
+          <span class="actions">您的购物车空空如也，去逛逛吧</span>
         </router-link>
       </div>
       <div class="right-actions">

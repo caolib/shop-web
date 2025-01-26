@@ -8,8 +8,8 @@ import CartView from '@/views/CartView.vue'
 import CommodityView from '@/views/CommodityView.vue'
 import OrderView from '@/views/OrderView.vue'
 import ErrorView from '@/views/ErrorView.vue'
-import OrderInfoView from '@/views/OrderInfoView.vue'
 import PayView from '@/views/PayView.vue'
+import OrderListView from '@/views/OrderListView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,14 +55,14 @@ const router = createRouter({
       component: OrderView,
     },
     {
+      path: '/order-list',
+      name: 'orderList',
+      component: OrderListView,
+    },
+    {
       path: '/error',
       name: 'error',
       component: ErrorView,
-    },
-    {
-      path: '/order-info',
-      name: 'order-info',
-      component: OrderInfoView,
     },
     {
       path: '/pay',

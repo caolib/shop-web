@@ -15,23 +15,32 @@ import {
 import { checkServicesHealth } from '@/api/status.js'
 import { jump } from './router/jump'
 import { useRoute } from 'vue-router'
-import router from './router'
+import { checkService } from '@/api/status.js'
+import { logout } from '@/api/login.js'
+
 
 const userInfo = useUserStore()
 const user = userInfo.user
-const isLogin = ref(false) // 是否已登录
+const isLogin = ref(false) // 用户是否已登录
 
 const route = useRoute()
-const isActive = (path) => route.path === path
+const isActive = (path) => route.path === path // 判断当前显示的页面
 
 const serviceStatus = ref(new Map()) // 服务状态
+// 所有服务是否正常
 const allServicesUp = computed(() => {
-  return Array.from(serviceStatus.value.values()).every((status) => status === 'UP')
+  return Array.from(serviceStatus.value.values()).every((status) => status)
 })
-// 获取服务状态
+
+// 获取所有服务状态
 const getServiceStatus = async () => {
   serviceStatus.value = await checkServicesHealth()
-  // console.log('serviceStatus', serviceStatus.value)
+}
+
+// 检查单个服务状态
+const checkSrv = async (service) => {
+  const status = await checkService(service);
+  message[status ? 'success' : 'error'](`${service} 服务${status ? '正常' : '异常'}`)
 }
 
 onMounted(() => {
@@ -41,12 +50,10 @@ onMounted(() => {
   onUnmounted(() => clearInterval(intervalId))
 })
 // 退出登录
-const logout = () => {
-  //TODO 退出登录后端删除用户相关信息和token
-  userInfo.clearUser()
-  jump('/login')
-  isLogin.value = false;
+const userLogout = () => {
+  logout()
   message.success('已退出登录')
+  isLogin.value = false
 }
 </script>
 
@@ -75,7 +82,7 @@ const logout = () => {
 
       <!--注册-->
       <a-breadcrumb-item v-if="!isLogin">
-        <router-link to="/register" :class="['route-link', { active: isActive('/register') }]">
+        <router-link to="" :class="['route-link']">
           <span>注册</span>
         </router-link>
       </a-breadcrumb-item>
@@ -90,7 +97,7 @@ const logout = () => {
 
       <!--我的订单-->
       <a-breadcrumb-item>
-        <router-link to="/order-info" :class="['route-link', { active: isActive('/order-info') }]">
+        <router-link to="/order-list" :class="['route-link', { active: isActive('/order-list') }]">
           <FileTextOutlined />
           我的订单
         </router-link>
@@ -105,7 +112,7 @@ const logout = () => {
       </a-breadcrumb-item>
 
       <!--退出登录-->
-      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout">
+      <a-breadcrumb-item v-if="isLogin" class="logout" @click="userLogout">
         <LogoutOutlined />
         退出登录
       </a-breadcrumb-item>
@@ -118,7 +125,8 @@ const logout = () => {
           <template #overlay>
             <a-menu>
               <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
-                <span :style="{ color: status[1] === 'UP' ? '#00b96b' : '#f30213' }">{{ status[0] }}</span>
+                <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{ status[0]
+                  }}</span>
               </a-menu-item>
             </a-menu>
           </template>

@@ -2,6 +2,35 @@
   <div class="order-view-body">
     <h2>订单确认</h2>
 
+    <!--商品卡片展示-->
+    <div class="commodity-display">
+      <a-row>
+        <a-col :span="4" v-for="item in selectedItems" :key="item.id">
+          <a-card class="commodity-card" hoverable @click="jumpToItem(item.itemId)">
+            <!-- 封面 -->
+            <template #cover>
+              <div style="display: flex;justify-content: center;margin-top: 5px;">
+                <img :src="item.image" style="width: 100px" alt="" />
+              </div>
+            </template>
+            <a-card-meta>
+              <!-- 价格 -->
+              <template #title>
+                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+              </template>
+              <!-- 商品描述 -->
+              <template #description>
+                <span class="commodity-desc">{{ item.name }}</span>
+                <div>
+                  <span style="margin-top: 5px; color: #00b96b">{{ item.num }}件</span>
+                </div>
+              </template>
+            </a-card-meta>
+          </a-card>
+        </a-col>
+      </a-row>
+    </div>
+
     <!-- 收货地址列表 -->
     <div class="address-list">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -36,34 +65,6 @@
           </div>
         </a-list-item>
       </a-list>
-    </div>
-    <!--商品卡片展示-->
-    <div class="commodity-display">
-      <a-row>
-        <a-col :span="4" v-for="item in selectedItems" :key="item.id">
-          <a-card class="commodity-card" hoverable @click="jumpToItem(item.itemId)">
-            <!-- 封面 -->
-            <template #cover>
-              <div style="display: flex;justify-content: center;margin-top: 5px;">
-                <img :src="item.image" style="width: 100px" alt="" />
-              </div>
-            </template>
-            <a-card-meta>
-              <!-- 价格 -->
-              <template #title>
-                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
-              </template>
-              <!-- 商品描述 -->
-              <template #description>
-                <span class="commodity-desc">{{ item.name }}</span>
-                <div>
-                  <span style="margin-top: 5px; color: #00b96b">{{ item.num }}件</span>
-                </div>
-              </template>
-            </a-card-meta>
-          </a-card>
-        </a-col>
-      </a-row>
     </div>
 
     <!--结算栏-->
@@ -167,10 +168,10 @@ const title = ref('新增地址')
 // 选择地址
 const selectAddress = (address) => {
   selectedAddress.value = address
-  console.log('选择地址', selectedAddress.value)
+  // console.log('选择地址', selectedAddress.value)
 }
 
-//TODO 设为默认地址
+// 设为默认地址
 const setDefaultAddress = async (address) => {
   if (address.isDefault) return
   await setDefaultAddrService(address.id).then(() => {
@@ -235,11 +236,20 @@ const submitOrder = async () => {
     num: item.num,
   }))
 
+  if (!selectedAddress.value) {
+    message.error('请先选择收货地址')
+    loading.value = false
+    return
+  }
+
   const orderForm = {
     addressId: selectedAddress.value.id,
     paymentType: 5,
     details: orderDetails,
   }
+
+  console.log('订单信息:', orderForm)
+
   // 创建订单
   await createOrderService(orderForm)
     .then((res) => {

@@ -1,25 +1,31 @@
 import request from '@/utils/request'
 
 // 定义服务的健康检查端点
-const services = ['carts', 'orders', 'users', 'commodity', 'pays']
+const services = ['carts', 'orders', 'users', 'commodity', 'pays', 'gateway']
 
-// 发送请求获取健康状态并返回一个映射服务和状态的 Map 对象
-async function checkServicesHealth() {
-  const healthStatusMap = new Map()
+/**
+ * 检查后端服务的健康状态
+ */
+const checkServicesHealth = async () => {
+  const status = new Map()
 
-  for (const service of services) {
-    await request
-      .get(`/${service}/health`)
-      .then((response) => {
-        // console.log(`response:`, response)
-        healthStatusMap.set(service, response.status)
-      })
-      .catch(() => {
-        healthStatusMap.set(service, 'error')
-      })
-  }
+  for (const service of services)
+    status.set(service, await checkService(service))
 
-  return healthStatusMap
+  return status
 }
 
-export { checkServicesHealth }
+
+/**
+ * 检查服务是否健康
+ * @param {*} service 服务名称
+ */
+const checkService = (service) => {
+  return request.get(`/${service}/health`)
+    .then((response) => {
+      if (response.status === 'UP') return true;
+    }).catch(() => { return false })
+}
+
+
+export { checkServicesHealth, checkService }
