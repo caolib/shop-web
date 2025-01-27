@@ -151,8 +151,8 @@ const checkout = () => {
     message.error('请选择要结算的商品')
     return
   }
-  jump('/order')
   orderStore.setSelectedItems(selectedItems.value)
+  jump('/order')
 }
 </script>
 

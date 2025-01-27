@@ -22,7 +22,7 @@
           <p class="commodity-comments"><span class="label">评论</span> {{ commodity.commentCount }}</p>
           <div class="commodity-buttons">
             <a-button type="primary" size="large" :loading="loading" @click="addToCart(commodity)">加入购物车</a-button>
-            <a-button type="primary" size="large" style="margin-left: 10px;">立即购买</a-button>
+            <a-button type="primary" @click="buyNow(commodity)" size="large" style="margin-left: 10px;">立即购买</a-button>
           </div>
         </a-col>
       </a-row>
@@ -30,7 +30,6 @@
   </div>
 </template>
 
-<!-- TODO立即购买等功能 -->
 
 <script setup>
 import { queryCommodityById } from '@/api/search'
@@ -40,10 +39,13 @@ import { onMounted, ref, h } from 'vue'
 import { useRoute } from 'vue-router'
 import { Button } from 'ant-design-vue/es/radio'
 import router from '@/router'
+import { useOrderStore } from '@/stores/order'
+import { jump } from '@/router/jump'
 
 const route = useRoute()
 const commodity = ref(null)
 const loading = ref(false)
+const orderStore = useOrderStore()
 
 onMounted(() => {
   // 解析路径参数id
@@ -96,6 +98,23 @@ const openNotification = () => {
     key,
   });
 };
+
+
+const selectedItems = ref([])
+
+// 立即购买
+const buyNow = (commodity) => {
+  console.log(commodity)
+  commodity.num = 1;
+  commodity.itemId = commodity.id;
+  selectedItems.value.push(commodity);
+  if (selectedItems.value.length === 0) {
+    message.error('请选择要结算的商品')
+    return
+  }
+  orderStore.setSelectedItems(selectedItems.value)
+  jump('/order')
+}
 
 </script>
 

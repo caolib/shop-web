@@ -21,8 +21,8 @@
               <!-- 商品描述 -->
               <template #description>
                 <span class="commodity-desc">{{ item.name }}</span>
-                <div>
-                  <span style="margin-top: 5px; color: #00b96b">{{ item.num }}件</span>
+                <div style="margin-top: 10px;">
+                  <span style="color: #00b96b">{{ item.num }}件</span>
                 </div>
               </template>
             </a-card-meta>
@@ -41,6 +41,7 @@
         <!--地址行-->
         <a-list-item class="address-row" v-for="address in addresses" :key="address.id" @click="selectAddress(address)"
           :class="{ selected: address.id === selectedAddress.id }">
+
           <!--地址信息-->
           <div class="address-info">
             <div>
@@ -49,6 +50,7 @@
               {{ address.street }} {{ address.mobile }}
               <a-tag v-if="address.isDefault" class="default-tag">默认地址</a-tag>
             </div>
+
             <!--地址操作-->
             <div class="address-actions">
               <a-button type="link" size="small" class="actions-btn" v-if="!address.isDefault"
@@ -88,7 +90,7 @@
             收货人：{{ selectedAddress.contact }} {{ selectedAddress.mobile }}
           </div>
         </a-col>
-        <a-col :span="4">
+        <a-col :span="4" style="text-align: right">
           <a-button type="primary" size="large" :loading="loading" @click="submitOrder">提交订单
           </a-button>
         </a-col>
@@ -227,7 +229,6 @@ const deleteAddress = async (address) => {
 
 const loading = ref(false) // 提交订单,按钮loading状态
 
-
 // 提交订单
 const submitOrder = async () => {
   loading.value = true
@@ -324,10 +325,12 @@ const submitOrder = async () => {
 }
 
 .order-footer {
+  padding: 10px;
   border: @border;
 }
 
 .commodity-card {
-  margin: 10px
+  margin: 10px;
+  box-shadow: @box-shadow;
 }
 </style>

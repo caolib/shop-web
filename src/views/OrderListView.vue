@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue';
 import { getUserOrdersService, deleteOrdersService } from '@/api/order'
 import { message } from 'ant-design-vue';
-import { orderColumns, getStatusText } from '@/config/columns/orderList/order';
+import { orderColumns, getStatusText, getStatusColor } from '@/config/columns/orderList/order';
 import { commodityColumns } from '@/config/columns/orderList/commodity';
-import { jumpToItem } from '@/router/jump';
+import { jumpToItem, jumpToPay } from '@/router/jump';
 
 const orders = ref([]); // 订单信息
 
@@ -44,20 +44,24 @@ onMounted(async () => {
     <!-- 订单信息表格 -->
     <a-table :key="tableKey" class="order-tb" :columns="orderColumns" :dataSource="orders" bordered
       :defaultExpandAllRows="true" :rowSelection="selectedRowKeys" :expandIconAsCell="false" :expandIconColumnIndex="-1"
-      :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)">
+      row-class-name="tb-row">
 
       <!-- 自定义渲染格式 -->
       <template #bodyCell="{ column, text, record }">
         <!-- 状态 -->
         <template v-if="column.key === 'status'">
-          <a-tag :color="text === '2' ? 'green' : 'blue'">{{ getStatusText(text) }}</a-tag>
+          <a-tag :color="getStatusColor(text)">{{ getStatusText(text) }}</a-tag>
         </template>
 
         <!-- 操作 -->
         <template v-if="column.key === 'action'">
-          <a-popconfirm title="确定删除该订单吗，删除后你可以在回收站找回" @confirm="deleteOrder(record.id)" ok-text="确定" cancel-text="取消">
-            <a-button danger type="primary" size="small">删除</a-button>
-          </a-popconfirm>
+          <div style="display:flex;padding: 5px;gap:10px;">
+            <a-button v-if="record.status === '1'" type="primary" size="small"
+              @click="jumpToPay(record.id)">支付</a-button>
+            <a-popconfirm title="确定删除该订单吗，删除后你可以在回收站找回" @confirm="deleteOrder(record.id)" ok-text="确定" cancel-text="取消">
+              <a-button danger type="primary" size="small">删除</a-button>
+            </a-popconfirm>
+          </div>
         </template>
 
       </template>
@@ -66,6 +70,7 @@ onMounted(async () => {
       <template #expandedRowRender="{ record }">
         <a-table class="commodity-tb" :columns="commodityColumns" :dataSource="record.orderDetails" bordered
           :pagination="false">
+
           <template #bodyCell="{ record, column, text }">
 
             <!-- 商品图片 -->
@@ -128,12 +133,15 @@ a.item-name {
   font-size: 12px;
 }
 
-/* 斑马纹效果 */
-.order-tb :deep(.table-striped) td {
-  background-color: #ededed;
+:deep(.tb-row) td {
+  background-color: @tb-row-bg;
 }
 
 .hidden-column {
   display: none;
+}
+
+.commodity-tb>th {
+  color: gray;
 }
 </style>

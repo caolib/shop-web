@@ -18,13 +18,13 @@ const checkServicesHealth = async () => {
 
 /**
  * 检查服务是否健康
- * @param {*} service 服务名称
+ * TODO:待校验
+ * @param service 服务名称
  */
 const checkService = (service) => {
-  return request.get(`/${service}/health`)
-    .then((response) => {
-      if (response.status === 'UP') return true;
-    }).catch(() => { return false })
+  return request.get(`/${service}/health`).then(() => {
+    return true;
+  }).catch(() => { return false })
 }
 
 
