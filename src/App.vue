@@ -87,6 +87,15 @@ const userLogout = () => {
         </router-link>
       </a-breadcrumb-item>
 
+      <!--搜索商品-->
+      <a-breadcrumb-item>
+        <router-link to="/search" :class="['route-link', { active: isActive('/search') }]">
+          <SearchOutlined />
+          搜索商品
+        </router-link>
+      </a-breadcrumb-item>
+
+
       <!--购物车-->
       <a-breadcrumb-item>
         <router-link to="/cart" :class="['route-link', { active: isActive('/cart') }]">
@@ -103,13 +112,6 @@ const userLogout = () => {
         </router-link>
       </a-breadcrumb-item>
 
-      <!--搜索商品-->
-      <a-breadcrumb-item>
-        <router-link to="/search" :class="['route-link', { active: isActive('/search') }]">
-          <SearchOutlined />
-          搜索商品
-        </router-link>
-      </a-breadcrumb-item>
 
       <!--退出登录-->
       <a-breadcrumb-item v-if="isLogin" class="logout" @click="userLogout">

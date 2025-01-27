@@ -11,7 +11,7 @@ const orderId = route.query.orderId
 const activeKey = ref('1'); // 默认使用第一种支付方式
 const visible = ref(false)
 const payOrder = ref() // 支付单号
-const paySuccess = ref(false) // 支付成功
+const paySuccess = ref(0) // 0 - 未支付 1 - 已支付 2 - 订单取消
 
 const order = ref(null) // 订单
 const countdown = ref('') // 倒计时
@@ -26,10 +26,9 @@ const updateCountdown = (deadline) => {
     countdown.value = '订单已取消'
     clearInterval(interval)
   } else {
-    const hours = Math.floor(diff / (1000 * 60 * 60))
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-    countdown.value = `${hours}小时${minutes}分钟${seconds}秒`
+    const minutes = Math.floor(diff / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    countdown.value = `${minutes}分钟${seconds}秒`;
   }
 }
 
@@ -40,16 +39,22 @@ onMounted(async () => {
     // 获取订单信息
     await getOrderByIdService(orderId).then((res) => {
       order.value = res
-      console.log('订单详情', order.value)
+      if (order.value.status === 5) {
+        paySuccess.value = 2;
+        return;
+      }
+      // console.log('订单详情', order.value)
     })
     // 创建支付单
     createPayOrder()
   }
   const createTime = order.value.createTime
   console.log('订单创建时间', createTime)
-  const deadline = dayjs(createTime).add(12, 'hour')
+  const deadline = dayjs(createTime).add(10, 'minute')
   updateCountdown(deadline)
   interval = setInterval(() => updateCountdown(deadline), 1000)
+
+  console.log(paySuccess.value)
 })
 
 // 创建支付单
@@ -64,7 +69,7 @@ const createPayOrder = async () => {
   // 创建支付订单
   await createPayOrderService(form).then((res) => {
     if (res.code === 1001) {
-      paySuccess.value = true
+      paySuccess.value = 1;
       message.success('订单已支付')
     }
     payOrder.value = res.data;
@@ -77,7 +82,7 @@ const pay = async () => {
   await payService(payOrder.value.id, password.value).then(res => {
     if (res.code === 200) {
       message.success('支付成功')
-      paySuccess.value = true
+      paySuccess.value = 1;
     }
   })
 }
@@ -85,8 +90,8 @@ const pay = async () => {
 
 <template>
   <div class="pay-view">
-    <!-- 待支付状态 -->
-    <a-result status="info" v-if="!paySuccess" title="订单创建成功">
+    <!--TODO 待支付状态，订单取消功能待完成 -->
+    <a-result status="info" v-if="paySuccess === 0" title="订单创建成功">
       <template #subTitle>
         <div>
           订单号:
@@ -110,8 +115,8 @@ const pay = async () => {
         </div>
       </template>
     </a-result>
-    <!--TODO 支付成功状态,添加其他按钮跳转 -->
-    <a-result status="success" v-else title="支付成功">
+    <!--TODO 支付成功状态,添加其他按钮跳转待完成 -->
+    <a-result status="success" v-if="paySuccess === 1" title="支付成功">
       <template #subTitle>
         <div>
           订单号:
@@ -121,6 +126,21 @@ const pay = async () => {
         </div>
       </template>
     </a-result>
+
+    <!-- 订单被取消 -->
+    <a-result status="error" v-if="paySuccess === 2" title="订单被取消">
+      <template #subTitle>
+        <div>
+          订单号:
+          <a-typography-paragraph style="display: inline;" :copyable="{ tooltip: false }">
+            {{ orderId }}
+          </a-typography-paragraph>
+        </div>
+      </template>
+    </a-result>
+
+
+
   </div>
 </template>
 

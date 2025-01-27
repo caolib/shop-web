@@ -40,7 +40,7 @@ const register = async () => {
 
 // 账号密码登录
 const onFinish = async () => {
-  spinning.value = true
+  const hide = message.loading('登录中...', 0)
   await loginService(formState).then((res) => {
     // 保存到pinia
     userInfo.setUser({
@@ -51,9 +51,9 @@ const onFinish = async () => {
       token: res.token,
     })
   }).finally(() => {
-    spinning.value = false
+    hide()
   })
-  spinning.value = false
+  // 跳转到首页
   window.location.reload()
   await router.push({ path: '/' }).then(() => { window.location.reload() })
   message.success('登录成功!')
@@ -121,12 +121,6 @@ const loginByQQ = async () => {
 const loginByGitlab = () => {
   // TODO: gitlab登录
   message.info('暂不支持Gitlab登录')
-}
-
-// 忘记密码
-const getBackPassword = () => {
-  // TODO: 忘记密码
-  message.info('暂不支持找回密码')
 }
 
 

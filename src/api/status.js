@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 定义服务的健康检查端点
-const services = ['carts', 'orders', 'users', 'commodity', 'pays', 'gateway']
+const services = ['carts', 'orders', 'users', 'commodity', 'pays']
 
 /**
  * 检查后端服务的健康状态
@@ -23,9 +23,7 @@ const checkServicesHealth = async () => {
 const checkService = (service) => {
   return request.get(`/${service}/health`).then(() => {
     return true;
-  }).catch((error) => {
-    const code = error.response.status;
-    if (code === 200) return true;
+  }).catch(() => {
     return false;
   });
 }
