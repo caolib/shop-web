@@ -1,3 +1,85 @@
+<script setup>
+import { queryCommodityById } from '@/api/search'
+import { addCartService } from '@/api/cart'
+import { message, notification } from 'ant-design-vue'
+import { onMounted, ref, h } from 'vue'
+import { useRoute } from 'vue-router'
+import { Button } from 'ant-design-vue/es/radio'
+import { useOrderStore } from '@/stores/order'
+import { jump } from '@/router/jump'
+
+const route = useRoute()
+const commodity = ref(null)
+const orderStore = useOrderStore()
+
+onMounted(() => {
+  // 解析路径参数id
+  const id = route.query.id
+  if (id) {
+    console.log(`商品ID: ${id}`)
+    queryCommodity(id)
+  }
+})
+
+// 查询商品
+const queryCommodity = async (id) => {
+  await queryCommodityById(id).then((res) => {
+    commodity.value = res
+  })
+}
+
+// 加入购物车
+const addToCart = async (commodity) => {
+  const hide = message.loading('正在添加商品到购物车...', 0)
+  await addCartService(commodity).then(() => {
+    openNotification()
+  }).finally(() => {
+    hide()
+  })
+}
+
+// 添加商品成功弹窗
+const openNotification = () => {
+  const key = `open${Date.now()}`;
+  notification.open({
+    type: 'success',
+    message: '添加成功，点击前往查看！',
+    duration: 3,
+    placement: 'bottomRight',
+    btn: h(
+      Button,
+      {
+        type: 'primary',
+        onClick: () => {
+          notification.close(key);
+          jump('/cart')
+        },
+      },
+      { default: () => '前往购物车结算', }
+    ),
+    key,
+  });
+};
+
+
+const selectedItems = ref([]) // 选中的的商品
+
+// 立即购买
+const buyNow = (commodity) => {
+  console.log(commodity)
+  commodity.num = 1;
+  commodity.itemId = commodity.id;
+  selectedItems.value.push(commodity);
+  if (selectedItems.value.length === 0) {
+    message.error('请选择要结算的商品')
+    return
+  }
+  orderStore.setSelectedItems(selectedItems.value)
+  jump('/order')
+}
+
+</script>
+
 <template>
   <div class="commodity-page">
     <div v-if="commodity" class="commodity-container">
@@ -21,7 +103,7 @@
           <p class="commodity-sold"><span class="label">销量</span> {{ commodity.sold }}</p>
           <p class="commodity-comments"><span class="label">评论</span> {{ commodity.commentCount }}</p>
           <div class="commodity-buttons">
-            <a-button type="primary" size="large" :loading="loading" @click="addToCart(commodity)">加入购物车</a-button>
+            <a-button type="primary" size="large" @click="addToCart(commodity)">加入购物车</a-button>
             <a-button type="primary" @click="buyNow(commodity)" size="large" style="margin-left: 10px;">立即购买</a-button>
           </div>
         </a-col>
@@ -31,92 +113,7 @@
 </template>
 
 
-<script setup>
-import { queryCommodityById } from '@/api/search'
-import { addCartService } from '@/api/cart'
-import { message, notification } from 'ant-design-vue'
-import { onMounted, ref, h } from 'vue'
-import { useRoute } from 'vue-router'
-import { Button } from 'ant-design-vue/es/radio'
-import router from '@/router'
-import { useOrderStore } from '@/stores/order'
-import { jump } from '@/router/jump'
 
-const route = useRoute()
-const commodity = ref(null)
-const loading = ref(false)
-const orderStore = useOrderStore()
-
-onMounted(() => {
-  // 解析路径参数id
-  const id = route.query.id
-  if (id) {
-    console.log(`商品ID: ${id}`)
-    queryCommodity(id)
-  }
-})
-
-// 查询商品
-const queryCommodity = async (id) => {
-  await queryCommodityById(id).then((res) => {
-    // console.log(res)
-    commodity.value = res
-  })
-}
-
-// 加入购物车
-const addToCart = async (commodity) => {
-  loading.value = true
-  await addCartService(commodity).then(() => {
-    loading.value = false
-    openNotification()
-  }).finally(() => {
-    loading.value = false
-  })
-}
-
-// 添加成功
-const openNotification = () => {
-  const key = `open${Date.now()}`;
-  notification.open({
-    type: 'success',
-    message: '添加成功，点击前往查看！',
-    duration: 3,
-    placement: 'topRight',
-    btn: h(
-      Button,
-      {
-        type: 'primary',
-        size: 'small',
-        onClick: () => {
-          notification.close(key);
-          router.push('/cart');
-        },
-      },
-      { default: () => '前往购物车结算', }
-    ),
-    key,
-  });
-};
-
-
-const selectedItems = ref([])
-
-// 立即购买
-const buyNow = (commodity) => {
-  console.log(commodity)
-  commodity.num = 1;
-  commodity.itemId = commodity.id;
-  selectedItems.value.push(commodity);
-  if (selectedItems.value.length === 0) {
-    message.error('请选择要结算的商品')
-    return
-  }
-  orderStore.setSelectedItems(selectedItems.value)
-  jump('/order')
-}
-
-</script>
 
 
 

@@ -1,19 +1,31 @@
 <script setup>
 import { reactive, computed, h, onMounted, ref } from 'vue'
-import { UserOutlined, LockOutlined, GithubFilled, GitlabFilled, WechatFilled, QqCircleFilled, PhoneOutlined } from '@ant-design/icons-vue'
+import {
+  UserOutlined,
+  LockOutlined,
+  GithubFilled,
+  GitlabFilled,
+  WechatFilled,
+  QqCircleFilled,
+  PhoneOutlined,
+} from '@ant-design/icons-vue'
 import { githubLoginService, loginService, registerService } from '@/api/login.js'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo.js'
-import router from '@/router/index.js'
-import { jump } from '@/router/jump'
-import { validateUsername, validatePassword, validatePhone } from '@/utils/validation.js'
+
+import { jump } from '@/router/jump.js'
+import { flushUser } from '@/api/app.js'
 
 const isRegister = ref(false)
 
+const jumpToHome = () => {
+  jump('/')
+  flushUser()
+}
 
 // 加载中
 const spinning = ref(false)
-const registerSpinning = ref(false);
+const registerSpinning = ref(false)
 
 const userInfo = useUserStore() //用户信息
 // 登录表单
@@ -31,8 +43,8 @@ const registerForm = reactive({
 
 // 用户注册
 const register = async () => {
-  console.log(registerForm)
-  await registerService(registerForm).then((res) => {
+  // console.log(registerForm)
+  await registerService(registerForm).then(() => {
     message.success('注册成功!')
     isRegister.value = false
   })
@@ -41,24 +53,23 @@ const register = async () => {
 // 账号密码登录
 const onFinish = async () => {
   const hide = message.loading('登录中...', 0)
-  await loginService(formState).then((res) => {
-    // 保存到pinia
-    userInfo.setUser({
-      id: res.userId,
-      username: res.username,
-      balance: res.balance,
-      avatar: res.avatar,
-      token: res.token,
+  await loginService(formState)
+    .then((res) => {
+      // 保存到pinia
+      userInfo.setUser({
+        id: res.userId,
+        username: res.username,
+        balance: res.balance,
+        avatar: res.avatar,
+        token: res.token,
+      })
     })
-  }).finally(() => {
-    hide()
-  })
+    .finally(() => {
+      hide()
+    })
   // 跳转到首页
-  window.location.reload()
-  await router.push({ path: '/' }).then(() => { window.location.reload() })
-  message.success('登录成功!')
+  jumpToHome()
 }
-
 
 // 判断登录表单是否禁用
 const disabled = computed(() => {
@@ -70,29 +81,31 @@ const disabled2 = computed(() => {
   return !(registerForm.username && registerForm.password && registerForm.phone)
 })
 
+// github 登录
 onMounted(() => {
   // GitHub 授权成功后，获取 code 并调用登录接口
   const urlParams = new URLSearchParams(window.location.search)
   const code = urlParams.get('code')
   if (code) {
     spinning.value = true
-    githubLoginService(code).then(async (res) => {
-      // console.log(res.data)
-      const data = res.data
-      // 保存到pinia
-      userInfo.setUser({
-        id: data.userId,
-        username: data.username,
-        balance: data.balance,
-        avatar: data.avatar,
-        token: data.token,
+    githubLoginService(code)
+      .then(async (res) => {
+        // console.log(res.data)
+        const data = res.data
+        // 保存到pinia
+        userInfo.setUser({
+          id: data.userId,
+          username: data.username,
+          balance: data.balance,
+          avatar: data.avatar,
+          token: data.token,
+        })
+        // 跳转到首页
+        jumpToHome()
       })
-      spinning.value = false
-      // 跳转到首页并刷新页面
-      await router.push({ path: '/' }).then(() => window.location.reload())
-    }).finally(() => {
-      spinning.value = false
-    })
+      .finally(() => {
+        spinning.value = false
+      })
   }
 })
 
@@ -122,8 +135,6 @@ const loginByGitlab = () => {
   // TODO: gitlab登录
   message.info('暂不支持Gitlab登录')
 }
-
-
 </script>
 
 <template>
@@ -138,7 +149,11 @@ const loginByGitlab = () => {
           </div>
 
           <!-- 用户名表单项 -->
-          <a-form-item label="账号" name="username" :rules="[{ required: true, message: '请输入用户名!' }]">
+          <a-form-item
+            label="账号"
+            name="username"
+            :rules="[{ required: true, message: '请输入用户名!' }]"
+          >
             <a-input v-model:value="formState.username">
               <template #prefix>
                 <UserOutlined class="site-form-item-icon" />
@@ -147,7 +162,11 @@ const loginByGitlab = () => {
           </a-form-item>
 
           <!-- 密码表单项 -->
-          <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入密码!' }]">
+          <a-form-item
+            label="密码"
+            name="password"
+            :rules="[{ required: true, message: '请输入密码!' }]"
+          >
             <a-input-password v-model:value="formState.password">
               <template #prefix>
                 <LockOutlined class="site-form-item-icon" />
@@ -157,43 +176,68 @@ const loginByGitlab = () => {
 
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
-            <a-button :disabled="disabled" :loading="spinning" type="primary" html-type="submit"
-              class="login-form-button">
+            <a-button
+              :disabled="disabled"
+              :loading="spinning"
+              type="primary"
+              html-type="submit"
+              class="login-form-button"
+            >
               登录
             </a-button>
             或
-            <a @click="() => { isRegister = true }">立即注册</a>
+            <a
+              @click="
+                () => {
+                  isRegister = true
+                }
+              "
+              >立即注册</a
+            >
           </a-form-item>
 
           <!-- 社交账号登录 -->
           <a-form-item style="margin-top: 30px">
-
             <!--github 登录按钮-->
             <a-space>
-              <a-button :class="['social-login-btn', 'github-btn']" shape="circle" :icon="h(GithubFilled)"
-                @click="loginByGithub" />
+              <a-button
+                :class="['social-login-btn', 'github-btn']"
+                shape="circle"
+                :icon="h(GithubFilled)"
+                @click="loginByGithub"
+              />
             </a-space>
 
             <!--微信登录按钮-->
             <a-space>
-              <a-button :class="['social-login-btn', 'wechat-btn']" shape="circle" :icon="h(WechatFilled)"
-                @click="loginByWeiXin" />
+              <a-button
+                :class="['social-login-btn', 'wechat-btn']"
+                shape="circle"
+                :icon="h(WechatFilled)"
+                @click="loginByWeiXin"
+              />
             </a-space>
 
             <!--QQ登录按钮-->
             <a-space>
-              <a-button :class="['social-login-btn', 'qq-btn']" shape="circle" :icon="h(QqCircleFilled)"
-                @click="loginByQQ" />
+              <a-button
+                :class="['social-login-btn', 'qq-btn']"
+                shape="circle"
+                :icon="h(QqCircleFilled)"
+                @click="loginByQQ"
+              />
             </a-space>
 
             <!--gitlab 登录按钮-->
             <a-space>
-              <a-button :class="['social-login-btn', 'gitlab-btn']" shape="circle" :icon="h(GitlabFilled)"
-                @click="loginByGitlab" />
+              <a-button
+                :class="['social-login-btn', 'gitlab-btn']"
+                shape="circle"
+                :icon="h(GitlabFilled)"
+                @click="loginByGitlab"
+              />
             </a-space>
-
           </a-form-item>
-
         </a-form>
 
         <!-- 注册表单 -->
@@ -203,9 +247,12 @@ const loginByGitlab = () => {
             <h2 class="form-title">注册</h2>
           </div>
           <!-- 用户名表单项 -->
-          <a-form-item label="账号" name="username"
-            :rules="[{ required: true, message: '请输入用户名!' }, { validator: validateUsername }]">
-            <a-input v-model:value="registerForm.username" @blur="() => validateUsername(null, registerForm.username)">
+          <a-form-item
+            label="账号"
+            name="username"
+            :rules="[{ required: true, message: '请输入用户名!' }]"
+          >
+            <a-input v-model:value="registerForm.username">
               <template #prefix>
                 <UserOutlined class="site-form-item-icon" />
               </template>
@@ -213,10 +260,15 @@ const loginByGitlab = () => {
           </a-form-item>
 
           <!-- 密码表单项 -->
-          <a-form-item label="密码" name="password"
-            :rules="[{ required: true, message: '请输入密码!' }, { validator: validatePassword }]">
-            <a-input-password v-model:value="registerForm.password"
-              @blur="() => validatePassword(null, registerForm.password)">
+          <a-form-item
+            label="密码"
+            name="password"
+            :rules="[{ required: true, message: '请输入密码!' }]"
+          >
+            <a-input-password
+              v-model:value="registerForm.password"
+              @blur="() => validatePassword(null, registerForm.password)"
+            >
               <template #prefix>
                 <LockOutlined class="site-form-item-icon" />
               </template>
@@ -224,10 +276,12 @@ const loginByGitlab = () => {
           </a-form-item>
 
           <!-- 电话 -->
-          <a-form-item label="电话" name="phone"
-            :rules="[{ required: true, message: '请输入电话!' }, { validator: validatePhone }]">
-            <a-input v-model:value="registerForm.phone" :maxlength="11"
-              @blur="() => validatePhone(null, registerForm.phone)">
+          <a-form-item
+            label="电话"
+            name="phone"
+            :rules="[{ required: true, message: '请输入电话!' }]"
+          >
+            <a-input v-model:value="registerForm.phone" :maxlength="11">
               <template #prefix>
                 <PhoneOutlined class="site-form-item-icon" />
               </template>
@@ -236,13 +290,17 @@ const loginByGitlab = () => {
 
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
-            <a-button :disabled="disabled2" :loading="registerSpinning" type="primary" html-type="submit"
-              class="login-form-button">
+            <a-button
+              :disabled="disabled2"
+              :loading="registerSpinning"
+              type="primary"
+              html-type="submit"
+              class="login-form-button"
+            >
               注册
             </a-button>
           </a-form-item>
         </a-form>
-
       </div>
     </div>
   </a-spin>
@@ -309,17 +367,17 @@ const loginByGitlab = () => {
 }
 
 .wechat-btn {
-  background-color: #1AAD19;
+  background-color: #1aad19;
   color: #fff;
 }
 
 .gitlab-btn {
-  background-color: #FC6D26;
+  background-color: #fc6d26;
   color: #fff;
 }
 
 .qq-btn {
-  background-color: #12B7F5;
+  background-color: #12b7f5;
   color: #fff;
 }
 </style>

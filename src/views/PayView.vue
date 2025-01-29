@@ -41,7 +41,7 @@ onMounted(async () => {
       order.value = res
       if (order.value.status === 5) {
         paySuccess.value = 2;
-        return;
+
       }
       // console.log('订单详情', order.value)
     })
@@ -79,11 +79,14 @@ const createPayOrder = async () => {
 
 // 余额支付
 const pay = async () => {
+  loading.value = true
   await payService(payOrder.value.id, password.value).then(res => {
     if (res.code === 200) {
       message.success('支付成功')
       paySuccess.value = 1;
     }
+  }).finally(() => {
+    loading.value = false
   })
 }
 </script>

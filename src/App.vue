@@ -1,7 +1,5 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useUserStore } from '@/stores/userInfo.js'
-import { message } from 'ant-design-vue'
 import {
   FileTextOutlined,
   HomeOutlined,
@@ -12,16 +10,10 @@ import {
   CheckCircleFilled,
   ExclamationCircleFilled,
 } from '@ant-design/icons-vue'
-import { checkServicesHealth } from '@/api/status.js'
-import { jump } from './router/jump'
+import { checkSrv, getServiceStatus } from '@/api/status.js'
 import { useRoute } from 'vue-router'
-import { checkService } from '@/api/status.js'
 import { logout } from '@/api/login.js'
-
-
-const userInfo = useUserStore()
-const user = userInfo.user
-const isLogin = ref(false) // 用户是否已登录
+import { flushUser, isLogin, user } from '@/api/app.js'
 
 const route = useRoute()
 const isActive = (path) => route.path === path // 判断当前显示的页面
@@ -32,29 +24,19 @@ const allServicesUp = computed(() => {
   return Array.from(serviceStatus.value.values()).every((status) => status)
 })
 
-// 获取所有服务状态
-const getServiceStatus = async () => {
-  serviceStatus.value = await checkServicesHealth()
-}
-
-// 检查单个服务状态
-const checkSrv = async (service) => {
-  const status = await checkService(service);
-  message[status ? 'success' : 'error'](`${service} 服务${status ? '正常' : '异常'}`)
-}
-
 onMounted(() => {
-  if (user.token != '') isLogin.value = true
-  getServiceStatus()
-  const intervalId = setInterval(getServiceStatus, 60000) // 60s执行一次
+  flushUser()
+  getServiceStatus(serviceStatus)
+  const intervalId = setInterval(() => getServiceStatus(serviceStatus), 60000) // 60s执行一次
   onUnmounted(() => clearInterval(intervalId))
 })
+
 // 退出登录
-const userLogout = () => {
-  logout()
-  message.success('已退出登录')
-  isLogin.value = false
-}
+// const userLogout = () => {
+//   logout()
+//   message.success('已退出登录')
+//   isLogin.value = false
+// }
 </script>
 
 <template>
@@ -75,7 +57,9 @@ const userLogout = () => {
           <user-outlined />
           <span v-if="isLogin"> 你好,{{ user.username }} </span>
           <span v-else>
-            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]">&nbsp;请登录 </router-link>
+            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]"
+              >&nbsp;请登录
+            </router-link>
           </span>
         </router-link>
       </a-breadcrumb-item>
@@ -95,7 +79,6 @@ const userLogout = () => {
         </router-link>
       </a-breadcrumb-item>
 
-
       <!--购物车-->
       <a-breadcrumb-item>
         <router-link to="/cart" :class="['route-link', { active: isActive('/cart') }]">
@@ -112,9 +95,8 @@ const userLogout = () => {
         </router-link>
       </a-breadcrumb-item>
 
-
       <!--退出登录-->
-      <a-breadcrumb-item v-if="isLogin" class="logout" @click="userLogout">
+      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout">
         <LogoutOutlined />
         退出登录
       </a-breadcrumb-item>
@@ -127,8 +109,11 @@ const userLogout = () => {
           <template #overlay>
             <a-menu>
               <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
-                <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{ status[0]
-                  }}</span>
+                <span
+                  @click="checkSrv(status[0])"
+                  :style="{ color: status[1] ? '#00b96b' : '#f30213' }"
+                  >{{ status[0] }}</span
+                >
               </a-menu-item>
             </a-menu>
           </template>

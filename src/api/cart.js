@@ -5,7 +5,7 @@ import request from '@/utils/request'
  * @param commodity 商品信息
  */
 const addCartService = (commodity) => {
-  console.log(`加入购物车: ${JSON.stringify(commodity)}`)
+  // console.log(`加入购物车: ${JSON.stringify(commodity)}`)
   const cartForm = {
     itemId: commodity.id,
     name: commodity.name,

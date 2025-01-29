@@ -9,7 +9,7 @@
           <a-card class="commodity-card" hoverable @click="jumpToItem(item.itemId)">
             <!-- 封面 -->
             <template #cover>
-              <div style="display: flex;justify-content: center;margin-top: 5px;">
+              <div style="display: flex; justify-content: center; margin-top: 5px">
                 <img :src="item.image" style="width: 100px" alt="" />
               </div>
             </template>
@@ -21,7 +21,7 @@
               <!-- 商品描述 -->
               <template #description>
                 <span class="commodity-desc">{{ item.name }}</span>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px">
                   <span style="color: #00b96b">{{ item.num }}件</span>
                 </div>
               </template>
@@ -33,15 +33,19 @@
 
     <!-- 收货地址列表 -->
     <div class="address-list">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center">
         <h3>收货人信息</h3>
         <a-button type="link" size="small" @click="openAddr">新增地址</a-button>
       </div>
       <a-list>
         <!--地址行-->
-        <a-list-item class="address-row" v-for="address in addresses" :key="address.id" @click="selectAddress(address)"
-          :class="{ selected: address.id === selectedAddress.id }">
-
+        <a-list-item
+          class="address-row"
+          v-for="address in addresses"
+          :key="address.id"
+          @click="selectAddress(address)"
+          :class="{ selected: address.id === selectedAddress.id }"
+        >
           <!--地址信息-->
           <div class="address-info">
             <div>
@@ -53,16 +57,29 @@
 
             <!--地址操作-->
             <div class="address-actions">
-              <a-button type="link" size="small" class="actions-btn" v-if="!address.isDefault"
-                @click.stop="setDefaultAddress(address)">设为默认地址
+              <a-button
+                type="link"
+                size="small"
+                class="actions-btn"
+                v-if="!address.isDefault"
+                @click.stop="setDefaultAddress(address)"
+                >设为默认地址
               </a-button>
-              <a-button type="link" size="small" class="actions-btn" @click.stop="openUpdateAddr(address)">编辑
+              <a-button
+                type="link"
+                size="small"
+                class="actions-btn"
+                @click.stop="openUpdateAddr(address)"
+                >编辑
               </a-button>
-              <a-popconfirm title="确定删除吗?" ok-text="确定" cancel-text="我再想想" @confirm="deleteAddress(address)"
-                @cancel="cancel">
+              <a-popconfirm
+                title="确定删除吗?"
+                ok-text="确定"
+                cancel-text="我再想想"
+                @confirm="deleteAddress(address)"
+              >
                 <a-button type="link" size="small" class="actions-btn">删除</a-button>
               </a-popconfirm>
-
             </div>
           </div>
         </a-list-item>
@@ -80,7 +97,10 @@
       <!--选择的地址信息行-->
       <a-row style="margin-top: 10px">
         <a-col :span="20" style="color: grey">
-          <div v-if="selectedAddress" style="display: flex; gap: 10px; font-size: 12px;color:black">
+          <div
+            v-if="selectedAddress"
+            style="display: flex; gap: 10px; font-size: 12px; color: black"
+          >
             寄送至：
             <span>{{ selectedAddress.contact }}</span>
             <span>{{ selectedAddress.province }}</span>
@@ -91,32 +111,52 @@
           </div>
         </a-col>
         <a-col :span="4" style="text-align: right">
-          <a-button type="primary" size="large" :loading="loading" @click="submitOrder">提交订单
+          <a-button type="primary" size="large" :loading="loading" @click="submitOrder"
+            >提交订单
           </a-button>
         </a-col>
       </a-row>
     </div>
 
     <!-- 地址表单 -->
-    <a-modal v-model:open="visible" :title="title" ok-text="确定" cancel-text="取消" @ok="addOrUpdateAddr">
+    <a-modal
+      v-model:open="visible"
+      :title="title"
+      ok-text="确定"
+      cancel-text="取消"
+      @ok="addOrUpdateAddr"
+    >
       <a-form ref="formRef" :model="addressData" layout="horizontal" name="form_in_modal">
-        <a-form-item v-for="(label, key) in formFields" :key="key" :name="key" :label="label"
-          :rules="key !== 'notes' ? [{ required: true, message: `请填写 ${label.toLowerCase()}!` }] : []">
+        <a-form-item
+          v-for="(label, key) in formFields"
+          :key="key"
+          :name="key"
+          :label="label"
+          :rules="
+            key !== 'notes' ? [{ required: true, message: `请填写 ${label.toLowerCase()}!` }] : []
+          "
+        >
           <a-input v-model:value="addressData[key]" />
         </a-form-item>
       </a-form>
     </a-modal>
-
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, reactive, toRaw } from 'vue'
 import { useOrderStore } from '@/stores/order.js'
-import { addAddressService, deleteAddressService, getAddressService, setDefaultAddrService, updateAddressService } from '@/api/address.js'
+import {
+  addAddressService,
+  deleteAddressService,
+  getAddressService,
+  setDefaultAddrService,
+  updateAddressService,
+} from '@/api/address.js'
 import { jumpToItem, jumpToPay } from '@/router/jump.js'
 import { createOrderService } from '@/api/order.js'
 import { message } from 'ant-design-vue'
+import { formFields } from '@/config/address/index.js'
 
 const orderStore = useOrderStore()
 const selectedItems = ref([]) // 选中的商品
@@ -155,15 +195,15 @@ const addressData = reactive({
   notes: '',
 })
 
-const formFields = {
-  province: '省',
-  city: '市',
-  town: '区/县',
-  street: '街道',
-  mobile: '手机',
-  contact: '联系人',
-  notes: '备注 ',
-}
+// const formFields = {
+//   province: '省',
+//   city: '市',
+//   town: '区/县',
+//   street: '街道',
+//   mobile: '手机',
+//   contact: '联系人',
+//   notes: '备注 ',
+// }
 
 const title = ref('新增地址')
 
@@ -187,22 +227,24 @@ const addOrUpdateAddr = async () => {
   // 表单校验
   formRef.value.validateFields().then(() => {
     console.log('表单信息', addressData)
-    visible.value = false;
-    formRef.value.resetFields();
+    visible.value = false
+    formRef.value.resetFields()
   })
   if (title.value === '新增地址') {
     await addAddressService(addressData).then(() => {
-      queryAddress(); message.success('新增成功')
+      queryAddress()
+      message.success('新增成功')
     })
   } else if (title.value === '修改地址') {
     await updateAddressService(addressData).then(() => {
-      queryAddress(); message.success('修改成功')
+      queryAddress()
+      message.success('修改成功')
     })
   }
 }
 
-const formRef = ref();
-const visible = ref(false);
+const formRef = ref()
+const visible = ref(false)
 
 // 打开新增地址表单
 const openAddr = () => {
@@ -249,7 +291,7 @@ const submitOrder = async () => {
     details: orderDetails,
   }
 
-  console.log('订单信息:', orderForm)
+  // console.log('订单信息:', orderForm)
 
   // 创建订单
   await createOrderService(orderForm)
@@ -257,7 +299,7 @@ const submitOrder = async () => {
       console.log('订单号:', res)
       message.success('订单创建成功')
       orderStore.clearSelectedItems() // 清除选择的商品信息
-      jumpToPay(res)// 跳转到订单列表页
+      jumpToPay(res) // 跳转到订单列表页
     })
     .finally(() => {
       loading.value = false

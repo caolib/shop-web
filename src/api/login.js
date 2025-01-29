@@ -2,6 +2,7 @@ import request from '@/utils/request'
 import { useUserStore } from '@/stores/userInfo.js'
 import { jump } from '@/router/jump'
 import { message } from 'ant-design-vue'
+import { isLogin } from '@/api/app.js'
 
 
 /**
@@ -42,6 +43,8 @@ const logout = () => {
   const userInfo = useUserStore()
   userInfo.clearUser()
   jump('/login')
+  message.success('已退出登录')
+  isLogin.value = false
 }
 
 export {

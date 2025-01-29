@@ -1,5 +1,9 @@
 import router from "."
 
+// 跳转到指定页面
+const jump = (path) => {
+    router.push({ path })
+}
 
 // 跳转到指定商品页面
 const jumpToItem = (id) => {
@@ -11,8 +15,16 @@ const jumpToPay = (orderId) => {
     router.push({ path: '/pay', query: { orderId } })
 }
 
-const jump = (path) => {
-    router.push({ path })
+
+
+// 跳转到指定页面并携带参数
+const jumpWithQuery = (path, query) => {
+    router.push({ path, query })
 }
 
-export { jumpToItem, jump, jumpToPay }
+export {
+    jumpToItem,
+    jump,
+    jumpToPay,
+    jumpWithQuery
+}

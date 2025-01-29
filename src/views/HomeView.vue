@@ -1,25 +1,11 @@
 <script setup>
-import router from '@/router/index.js'
-import {
-  BgColorsOutlined,
-  CarOutlined,
-  DesktopOutlined,
-  HomeOutlined,
-  MedicineBoxOutlined,
-  MobileOutlined,
-  ScissorOutlined,
-  ShoppingOutlined,
-  SkinOutlined,
-  ThunderboltOutlined,
-  UserOutlined,
-} from '@ant-design/icons-vue'
+import { menuItems } from '@/config/home'
 import { searchService } from '@/api/search.js'
 import { onMounted, reactive, ref } from 'vue'
-import { jumpToItem } from '@/router/jump'
+import { jumpToItem, jumpWithQuery } from '@/router/jump'
 
-const commodity = ref([])
-
-const key = ref('')
+const commodity = ref([]) // 商品列表
+const key = ref('') // 搜索关键字
 
 // 搜索商品
 const search = async () => {
@@ -34,31 +20,17 @@ onMounted(() => {
   search()
 })
 
-// 商品分类菜单
-const menuItems = [
-  { key: 1, icon: ThunderboltOutlined, items: ['家用电器'] },
-  { key: 2, icon: MobileOutlined, items: ['手机', '运营商', '数码'] },
-  { key: 3, icon: DesktopOutlined, items: ['电脑', '办公', '文具用品'] },
-  { key: 4, icon: HomeOutlined, items: ['家居', '家具', '家装', '厨具'] },
-  { key: 5, icon: SkinOutlined, items: ['男装', '女装', '童装', '内衣'] },
-  { key: 6, icon: ScissorOutlined, items: ['美妆', '个护清洁', '宠物'] },
-  { key: 7, icon: ShoppingOutlined, items: ['女鞋', '箱包', '钟表', '珠宝'] },
-  { key: 8, icon: UserOutlined, items: ['男鞋', '运动', '户外'] },
-  { key: 9, icon: CarOutlined, items: ['房产', '汽车', '汽车用品'] },
-  { key: 10, icon: MedicineBoxOutlined, items: ['母婴', '玩具乐器'] },
-  { key: 11, icon: BgColorsOutlined, items: ['食品', '酒类', '生鲜', '特产'] },
-]
 
 // 商品分类点击事件
 const handleClick = (item) => {
   // message.success(`商品分类: ${item}`)
-  router.push({ path: '/search', query: { category: item } })
+  jumpWithQuery('/search', { category: item })
 }
 
 // 搜索按钮点击事件
 const handleSearchClick = () => {
   // message.success(`关键字: ${key.value}`)
-  router.push({ path: '/search', query: { key: key.value } })
+  jumpWithQuery('/search', { key: key.value })
 }
 </script>
 
@@ -93,7 +65,7 @@ const handleSearchClick = () => {
           <a-col :span="6" v-for="item in commodity" :key="item.id">
             <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
               <template #cover>
-                <img :src="item.image"  alt=""/>
+                <img :src="item.image" alt="" />
               </template>
               <a-card-meta>
                 <template #title>
