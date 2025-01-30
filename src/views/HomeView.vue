@@ -1,15 +1,15 @@
 <script setup>
 import { menuItems } from '@/config/home'
-import { searchService } from '@/api/search.js'
+import { searchHomeService, searchService } from '@/api/search.js'
 import { onMounted, reactive, ref } from 'vue'
 import { jumpToItem, jumpWithQuery } from '@/router/jump'
 
 const commodity = ref([]) // 商品列表
 const key = ref('') // 搜索关键字
 
-// 搜索商品
+// 搜索主页商品
 const search = async () => {
-  await searchService(reactive({ pageSize: 24 })).then((res) => {
+  await searchHomeService().then((res) => {
     // console.log(res)
     commodity.value = res.list
   })

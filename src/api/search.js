@@ -1,6 +1,15 @@
 import request from '@/utils/request'
 
 /**
+ * 搜索首页商品
+ */
+const searchHomeService = () => {
+  return request.get('/commodity/home')
+}
+
+
+
+/**
  * 搜索商品
  */
 const searchService = (searchParams) => {
@@ -20,4 +29,4 @@ const queryCommodityById = (id) => {
   return request.get('/commodity/' + id)
 }
 
-export { searchService, queryCommodityById }
+export { searchService, queryCommodityById, searchHomeService }
