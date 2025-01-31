@@ -1,7 +1,7 @@
 <script setup>
 import { menuItems } from '@/config/home'
-import { searchHomeService, searchService } from '@/api/search.js'
-import { onMounted, reactive, ref } from 'vue'
+import { searchHomeService } from '@/api/search.js'
+import { onMounted, ref } from 'vue'
 import { jumpToItem, jumpWithQuery } from '@/router/jump'
 
 const commodity = ref([]) // 商品列表

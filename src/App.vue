@@ -9,11 +9,14 @@ import {
   UserOutlined,
   CheckCircleFilled,
   ExclamationCircleFilled,
+  ArrowLeftOutlined,
+  ArrowRightOutlined
 } from '@ant-design/icons-vue'
 import { checkSrv, getServiceStatus } from '@/api/status.js'
 import { useRoute } from 'vue-router'
 import { logout } from '@/api/login.js'
 import { flushUser, isLogin, user } from '@/api/app.js'
+import { goPage } from './router/jump'
 
 const route = useRoute()
 const isActive = (path) => route.path === path // 判断当前显示的页面
@@ -31,18 +34,20 @@ onMounted(() => {
   onUnmounted(() => clearInterval(intervalId))
 })
 
-// 退出登录
-// const userLogout = () => {
-//   logout()
-//   message.success('已退出登录')
-//   isLogin.value = false
-// }
 </script>
 
 <template>
   <!--顶部导航栏-->
   <div class="top-navbar">
-    <a-breadcrumb style="margin-left: 100px">
+    <a-breadcrumb separator=" ">
+      <!--回退-->
+      <a-breadcrumb-item class="actions" @click="goPage(-1)">
+        <ArrowLeftOutlined />
+      </a-breadcrumb-item>
+      <!--前进-->
+      <a-breadcrumb-item class="actions" @click="goPage(1)">
+        <ArrowRightOutlined />
+      </a-breadcrumb-item>
       <!--首页-->
       <a-breadcrumb-item>
         <router-link to="/" :class="['route-link', { active: isActive('/') }]">
@@ -57,8 +62,7 @@ onMounted(() => {
           <user-outlined />
           <span v-if="isLogin"> 你好,{{ user.username }} </span>
           <span v-else>
-            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]"
-              >&nbsp;请登录
+            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]">&nbsp;请登录
             </router-link>
           </span>
         </router-link>
@@ -96,7 +100,7 @@ onMounted(() => {
       </a-breadcrumb-item>
 
       <!--退出登录-->
-      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout">
+      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout('')">
         <LogoutOutlined />
         退出登录
       </a-breadcrumb-item>
@@ -109,11 +113,8 @@ onMounted(() => {
           <template #overlay>
             <a-menu>
               <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
-                <span
-                  @click="checkSrv(status[0])"
-                  :style="{ color: status[1] ? '#00b96b' : '#f30213' }"
-                  >{{ status[0] }}</span
-                >
+                <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{ status[0]
+                  }}</span>
               </a-menu-item>
             </a-menu>
           </template>
@@ -150,6 +151,17 @@ a:hover {
 .logout:hover {
   cursor: pointer;
   color: @red;
+}
+
+.actions {
+  margin-right: 5px;
+}
+
+.actions:hover {
+  border-radius: 5px;
+  cursor: pointer;
+  color: @primary-color;
+  background: #d5d5d5;
 }
 
 .active {

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import { message } from 'ant-design-vue'
 
 // 定义服务的健康检查端点
-const services = ['carts', 'orders', 'users', 'commodity', 'pays']
+const services = ['cart', 'order', 'user', 'commodity', 'pay']
 
 /**
  * 检查后端服务的健康状态

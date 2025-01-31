@@ -22,9 +22,16 @@ const jumpWithQuery = (path, query) => {
     router.push({ path, query })
 }
 
+// 回退(-)或前进(+)num个页面
+const goPage = (num) => {
+    router.go(num)
+}
+
+
 export {
     jumpToItem,
     jump,
     jumpToPay,
-    jumpWithQuery
+    jumpWithQuery,
+    goPage
 }

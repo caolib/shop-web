@@ -38,12 +38,14 @@ const cancelAccountServicce = () => {
 
 
 // 退出登录
-const logout = () => {
+const logout = (msg) => {
+  console.log(msg)
   //TODO 退出登录，后端删除用户相关信息和token
   const userInfo = useUserStore()
   userInfo.clearUser()
   jump('/login')
-  message.success('已退出登录')
+  msg = msg !== '' ? msg : '成功退出登录'
+  message.success(msg)
   isLogin.value = false
 }
 
