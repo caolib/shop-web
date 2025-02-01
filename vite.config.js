@@ -11,6 +11,7 @@ export default defineConfig({
     vue(),
     vueDevTools({
       launchEditor: 'code',
+      // launchEditor: 'webstorm',
     }),
   ],
   resolve: {

@@ -43,8 +43,7 @@ const updatePwd = async () => {
     return;
   }
   await updatePwdService(pwdForm).then(() => {
-    logout();
-    message.success('修改成功,请重新登录');
+    logout('修改成功,请重新登录');
   }).catch((err) => {
     message.error('修改失败', err);
   }).finally(() => {
@@ -60,8 +59,7 @@ const cancelAccount = async () => {
   visible2.value = false;
   loading.value = true;
   await cancelAccountServicce().then(() => {
-    logout();
-    message.success('账号注销成功');
+    logout('账号注销成功');
   }).catch((err) => {
     message.error('账号注销失败', err);
   }).finally(() => {

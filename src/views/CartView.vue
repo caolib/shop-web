@@ -9,6 +9,7 @@ import { jump, jumpToItem } from '@/router/jump'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, ref } from 'vue'
 import { useOrderStore } from '@/stores/order.js'
+import { columns } from '@/config/columns/cart'
 
 const cartData = ref([]) // 购物车数据
 const isCartEmpty = computed(() => cartData.value.length === 0) // 购物车是否为空
@@ -22,41 +23,6 @@ const queryCart = async () => {
   })
 }
 
-const columns = [
-  {
-    title: '商品图片',
-    dataIndex: 'image',
-    key: 'image',
-    scopedSlots: { customRender: 'image' },
-  },
-  {
-    title: '商品名称',
-    dataIndex: 'name',
-    key: 'name',
-    width: '30%',
-  },
-  {
-    title: '规格',
-    dataIndex: 'spec',
-    key: 'spec',
-    width: '20%',
-  },
-  {
-    title: '单价',
-    dataIndex: 'price',
-    key: 'price',
-    customRender: ({ text }) => `¥${(text / 100).toFixed(2)}`,
-  },
-  {
-    title: '数量',
-    dataIndex: 'num',
-    key: 'num',
-  },
-  {
-    title: '操作',
-    key: 'action',
-  },
-]
 
 onMounted(() => {
   queryCart()
@@ -69,7 +35,7 @@ const selectedIds = ref([])
 // 表格行选择
 const rowSelection = {
   onChange: (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
     selectedIds.value = selectedRowKeys
     selectedItems.value = selectedRows
   },

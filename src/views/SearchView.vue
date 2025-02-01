@@ -4,7 +4,7 @@ import { searchService } from '@/api/search.js'
 import router from '@/router/index.js'
 import { jumpToItem } from '@/router/jump'
 import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons-vue'
-
+import { handleImageError } from '@/utils/handleImg.js'
 
 const commodity = ref([]) // 商品列表
 const total = ref(0) // 商品总数
@@ -12,10 +12,11 @@ const total = ref(0) // 商品总数
 // 搜索商品信息
 const searchCommodity = async () => {
   const paramsCopy = Object.assign({}, searchParams);
+  // console.log('params:', paramsCopy)
   await searchService(paramsCopy).then((res) => {
     commodity.value = res.list
     total.value = res.total
-    console.log(res)
+    // console.log(res)
   })
 }
 
@@ -41,7 +42,10 @@ onMounted(() => {
   // 解析路径参数
   const { key, category } = router.currentRoute.value.query;
   // 设置搜索参数
-  if (key) searchParams.key = key
+  if (key) {
+    inputKey.value = key
+    searchParams.key = key
+  }
   if (category) searchParams.category = category
 
   searchCommodity()
@@ -137,7 +141,7 @@ const sortOptions = [
         <div>
           <span v-for="cate in presetCategories" :key="cate" @click="setCategory(cate)" class="condition-row-item">{{
             cate
-            }}</span>
+          }}</span>
         </div>
       </a-row>
 
@@ -181,8 +185,8 @@ const sortOptions = [
             <!-- 分页条 默认每页大小为24 -->
             <a-col><span>共 {{ total }} 件商品</span></a-col>
             <a-col>
-              <a-pagination v-model:current="searchParams.pageNo" @change="searchCommodity" :total="total"
-                page-size="24" simple />
+              <a-pagination v-model:current="searchParams.pageNo" @change="searchCommodity" :total="Number(total)"
+                :page-size=searchParams.pageSize simple />
             </a-col>
           </a-row>
         </a-col>
@@ -215,7 +219,7 @@ const sortOptions = [
           <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
             <!-- 封面 -->
             <template #cover>
-              <img :src="item.image" alt="" />
+              <img :src="item.image" :alt="item.name" @error="handleImageError" />
             </template>
             <a-card-meta>
               <!-- 价格 -->

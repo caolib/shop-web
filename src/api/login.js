@@ -2,13 +2,15 @@ import request from '@/utils/request'
 import { useUserStore } from '@/stores/userInfo.js'
 import { jump } from '@/router/jump'
 import { message } from 'ant-design-vue'
+import { isLogin } from '@/api/app.js'
 
 
 /**
  * 用户登录
- * @param user 用户信息 {username, password}
+ * @param user 用户信息 {username, password,identity}
  */
 const loginService = (user) => {
+  user.identity = 'user'
   return request.post('/users/login', user, { timeout: 5000 })
 }
 /**
@@ -37,11 +39,15 @@ const cancelAccountServicce = () => {
 
 
 // 退出登录
-const logout = () => {
+const logout = (msg) => {
+  console.log(msg)
   //TODO 退出登录，后端删除用户相关信息和token
   const userInfo = useUserStore()
   userInfo.clearUser()
   jump('/login')
+  msg = msg !== '' ? msg : '成功退出登录'
+  message.success(msg)
+  isLogin.value = false
 }
 
 export {

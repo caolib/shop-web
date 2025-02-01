@@ -1,7 +1,5 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useUserStore } from '@/stores/userInfo.js'
-import { message } from 'ant-design-vue'
 import {
   FileTextOutlined,
   HomeOutlined,
@@ -11,17 +9,14 @@ import {
   UserOutlined,
   CheckCircleFilled,
   ExclamationCircleFilled,
+  ArrowLeftOutlined,
+  ArrowRightOutlined
 } from '@ant-design/icons-vue'
-import { checkServicesHealth } from '@/api/status.js'
-import { jump } from './router/jump'
+import { checkSrv, getServiceStatus } from '@/api/status.js'
 import { useRoute } from 'vue-router'
-import { checkService } from '@/api/status.js'
 import { logout } from '@/api/login.js'
-
-
-const userInfo = useUserStore()
-const user = userInfo.user
-const isLogin = ref(false) // 用户是否已登录
+import { flushUser, isLogin, user } from '@/api/app.js'
+import { goPage } from './router/jump'
 
 const route = useRoute()
 const isActive = (path) => route.path === path // 判断当前显示的页面
@@ -32,35 +27,27 @@ const allServicesUp = computed(() => {
   return Array.from(serviceStatus.value.values()).every((status) => status)
 })
 
-// 获取所有服务状态
-const getServiceStatus = async () => {
-  serviceStatus.value = await checkServicesHealth()
-}
-
-// 检查单个服务状态
-const checkSrv = async (service) => {
-  const status = await checkService(service);
-  message[status ? 'success' : 'error'](`${service} 服务${status ? '正常' : '异常'}`)
-}
-
 onMounted(() => {
-  if (user.token != '') isLogin.value = true
-  getServiceStatus()
-  const intervalId = setInterval(getServiceStatus, 60000) // 60s执行一次
+  flushUser()
+  getServiceStatus(serviceStatus)
+  const intervalId = setInterval(() => getServiceStatus(serviceStatus), 60000) // 60s执行一次
   onUnmounted(() => clearInterval(intervalId))
 })
-// 退出登录
-const userLogout = () => {
-  logout()
-  message.success('已退出登录')
-  isLogin.value = false
-}
+
 </script>
 
 <template>
   <!--顶部导航栏-->
   <div class="top-navbar">
-    <a-breadcrumb style="margin-left: 100px">
+    <a-breadcrumb separator=" ">
+      <!--回退-->
+      <a-breadcrumb-item class="actions" @click="goPage(-1)">
+        <ArrowLeftOutlined />
+      </a-breadcrumb-item>
+      <!--前进-->
+      <a-breadcrumb-item class="actions" @click="goPage(1)">
+        <ArrowRightOutlined />
+      </a-breadcrumb-item>
       <!--首页-->
       <a-breadcrumb-item>
         <router-link to="/" :class="['route-link', { active: isActive('/') }]">
@@ -75,7 +62,8 @@ const userLogout = () => {
           <user-outlined />
           <span v-if="isLogin"> 你好,{{ user.username }} </span>
           <span v-else>
-            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]">&nbsp;请登录 </router-link>
+            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]">&nbsp;请登录
+            </router-link>
           </span>
         </router-link>
       </a-breadcrumb-item>
@@ -84,6 +72,14 @@ const userLogout = () => {
       <a-breadcrumb-item v-if="!isLogin">
         <router-link to="" :class="['route-link']">
           <span>注册</span>
+        </router-link>
+      </a-breadcrumb-item>
+
+      <!--搜索商品-->
+      <a-breadcrumb-item>
+        <router-link to="/search" :class="['route-link', { active: isActive('/search') }]">
+          <SearchOutlined />
+          搜索商品
         </router-link>
       </a-breadcrumb-item>
 
@@ -103,16 +99,8 @@ const userLogout = () => {
         </router-link>
       </a-breadcrumb-item>
 
-      <!--搜索商品-->
-      <a-breadcrumb-item>
-        <router-link to="/search" :class="['route-link', { active: isActive('/search') }]">
-          <SearchOutlined />
-          搜索商品
-        </router-link>
-      </a-breadcrumb-item>
-
       <!--退出登录-->
-      <a-breadcrumb-item v-if="isLogin" class="logout" @click="userLogout">
+      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout('')">
         <LogoutOutlined />
         退出登录
       </a-breadcrumb-item>
@@ -163,6 +151,17 @@ a:hover {
 .logout:hover {
   cursor: pointer;
   color: @red;
+}
+
+.actions {
+  margin-right: 5px;
+}
+
+.actions:hover {
+  border-radius: 5px;
+  cursor: pointer;
+  color: @primary-color;
+  background: #d5d5d5;
 }
 
 .active {
