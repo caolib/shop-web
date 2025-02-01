@@ -7,9 +7,10 @@ import { isLogin } from '@/api/app.js'
 
 /**
  * 用户登录
- * @param user 用户信息 {username, password}
+ * @param user 用户信息 {username, password,identity}
  */
 const loginService = (user) => {
+  user.identity = 'user'
   return request.post('/users/login', user, { timeout: 5000 })
 }
 /**
