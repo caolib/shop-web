@@ -118,7 +118,7 @@ const pay = async () => {
         </div>
       </template>
     </a-result>
-    <!--TODO 支付成功状态,添加其他按钮跳转待完成 -->
+    <!--支付成功状态 -->
     <a-result status="success" v-if="paySuccess === 1" title="支付成功">
       <template #subTitle>
         <div>

@@ -215,6 +215,7 @@ const sortOptions = [
     <!--商品卡片展示-->
     <div class="commodity-display">
       <a-row>
+        <a-empty style="width: 90vw;" v-if="commodity.length === 0" />
         <a-col :span="4" v-for="item in commodity" :key="item.id">
           <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
             <!-- 封面 -->

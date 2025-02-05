@@ -99,6 +99,14 @@ onMounted(() => {
         </router-link>
       </a-breadcrumb-item>
 
+      <!--关于-->
+      <a-breadcrumb-item>
+        <router-link to="/about" :class="['route-link', { active: isActive('/about') }]">
+          <FileTextOutlined />
+          关于
+        </router-link>
+      </a-breadcrumb-item>
+
       <!--退出登录-->
       <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout('')">
         <LogoutOutlined />
