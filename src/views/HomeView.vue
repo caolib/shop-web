@@ -69,7 +69,7 @@ const handleSearchClick = () => {
               </template>
               <a-card-meta>
                 <template #title>
-                  <span class="price">￥{{ item.price }}</span>
+                  <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
                 </template>
                 <template #description>
                   <span style="color: black">{{ item.name }}</span>
