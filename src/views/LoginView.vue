@@ -43,10 +43,12 @@ const registerForm = reactive({
 
 // 用户注册
 const register = async () => {
-  // console.log(registerForm)
+  const hide = message.loading('注册中...', 0)
   await registerService(registerForm).then(() => {
     message.success('注册成功!')
     isRegister.value = false
+  }).finally(() => {
+    hide()
   })
 }
 
@@ -149,11 +151,7 @@ const loginByGitlab = () => {
           </div>
 
           <!-- 用户名表单项 -->
-          <a-form-item
-            label="账号"
-            name="username"
-            :rules="[{ required: true, message: '请输入用户名!' }]"
-          >
+          <a-form-item label="账号" name="username" :rules="[{ required: true, message: '请输入用户名!' }]">
             <a-input v-model:value="formState.username">
               <template #prefix>
                 <UserOutlined class="site-form-item-icon" />
@@ -162,11 +160,7 @@ const loginByGitlab = () => {
           </a-form-item>
 
           <!-- 密码表单项 -->
-          <a-form-item
-            label="密码"
-            name="password"
-            :rules="[{ required: true, message: '请输入密码!' }]"
-          >
+          <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入密码!' }]">
             <a-input-password v-model:value="formState.password">
               <template #prefix>
                 <LockOutlined class="site-form-item-icon" />
@@ -176,66 +170,41 @@ const loginByGitlab = () => {
 
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
-            <a-button
-              :disabled="disabled"
-              :loading="spinning"
-              type="primary"
-              html-type="submit"
-              class="login-form-button"
-            >
+            <a-button :disabled="disabled" :loading="spinning" type="primary" html-type="submit"
+              class="login-form-button">
               登录
             </a-button>
             或
-            <a
-              @click="
-                () => {
-                  isRegister = true
-                }
-              "
-              >立即注册</a
-            >
+            <a @click="() => {
+                isRegister = true
+              }
+              ">立即注册</a>
           </a-form-item>
 
           <!-- 社交账号登录 -->
           <a-form-item style="margin-top: 30px">
             <!--github 登录按钮-->
             <a-space>
-              <a-button
-                :class="['social-login-btn', 'github-btn']"
-                shape="circle"
-                :icon="h(GithubFilled)"
-                @click="loginByGithub"
-              />
+              <a-button :class="['social-login-btn', 'github-btn']" shape="circle" :icon="h(GithubFilled)"
+                @click="loginByGithub" />
             </a-space>
 
             <!--微信登录按钮-->
             <a-space>
-              <a-button
-                :class="['social-login-btn', 'wechat-btn']"
-                shape="circle"
-                :icon="h(WechatFilled)"
-                @click="loginByWeiXin"
-              />
+              <a-button :class="['social-login-btn', 'wechat-btn']" shape="circle" :icon="h(WechatFilled)"
+                @click="loginByWeiXin" />
             </a-space>
 
             <!--QQ登录按钮-->
             <a-space>
-              <a-button
-                :class="['social-login-btn', 'qq-btn']"
-                shape="circle"
-                :icon="h(QqCircleFilled)"
-                @click="loginByQQ"
-              />
+              <a-button :class="['social-login-btn', 'qq-btn']" shape="circle" :icon="h(QqCircleFilled)"
+                @click="loginByQQ" />
             </a-space>
 
             <!--gitlab 登录按钮-->
             <a-space>
-              <a-button
-                :class="['social-login-btn', 'gitlab-btn']"
-                shape="circle"
-                :icon="h(GitlabFilled)"
-                @click="loginByGitlab"
-              />
+              <a-button :class="['social-login-btn', 'gitlab-btn']" shape="circle" :icon="h(GitlabFilled)"
+                @click="loginByGitlab" />
             </a-space>
           </a-form-item>
         </a-form>
@@ -247,11 +216,7 @@ const loginByGitlab = () => {
             <h2 class="form-title">注册</h2>
           </div>
           <!-- 用户名表单项 -->
-          <a-form-item
-            label="账号"
-            name="username"
-            :rules="[{ required: true, message: '请输入用户名!' }]"
-          >
+          <a-form-item label="账号" name="username" :rules="[{ required: true, message: '请输入用户名!' }]">
             <a-input v-model:value="registerForm.username">
               <template #prefix>
                 <UserOutlined class="site-form-item-icon" />
@@ -260,15 +225,9 @@ const loginByGitlab = () => {
           </a-form-item>
 
           <!-- 密码表单项 -->
-          <a-form-item
-            label="密码"
-            name="password"
-            :rules="[{ required: true, message: '请输入密码!' }]"
-          >
-            <a-input-password
-              v-model:value="registerForm.password"
-              @blur="() => validatePassword(null, registerForm.password)"
-            >
+          <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入密码!' }]">
+            <a-input-password v-model:value="registerForm.password"
+              @blur="() => validatePassword(null, registerForm.password)">
               <template #prefix>
                 <LockOutlined class="site-form-item-icon" />
               </template>
@@ -276,11 +235,7 @@ const loginByGitlab = () => {
           </a-form-item>
 
           <!-- 电话 -->
-          <a-form-item
-            label="电话"
-            name="phone"
-            :rules="[{ required: true, message: '请输入电话!' }]"
-          >
+          <a-form-item label="电话" name="phone" :rules="[{ required: true, message: '请输入电话!' }]">
             <a-input v-model:value="registerForm.phone" :maxlength="11">
               <template #prefix>
                 <PhoneOutlined class="site-form-item-icon" />
@@ -290,13 +245,8 @@ const loginByGitlab = () => {
 
           <!-- 登录按钮和注册链接 -->
           <a-form-item>
-            <a-button
-              :disabled="disabled2"
-              :loading="registerSpinning"
-              type="primary"
-              html-type="submit"
-              class="login-form-button"
-            >
+            <a-button :disabled="disabled2" :loading="registerSpinning" type="primary" html-type="submit"
+              class="login-form-button">
               注册
             </a-button>
           </a-form-item>
