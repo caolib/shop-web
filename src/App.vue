@@ -70,7 +70,7 @@ onMounted(() => {
 
       <!--注册-->
       <a-breadcrumb-item v-if="!isLogin">
-        <router-link to="" :class="['route-link']">
+        <router-link to="/" :class="['route-link']">
           <span>注册</span>
         </router-link>
       </a-breadcrumb-item>
