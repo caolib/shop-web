@@ -10,6 +10,7 @@ import OrderView from '@/views/OrderView.vue'
 import ErrorView from '@/views/ErrorView.vue'
 import PayView from '@/views/PayView.vue'
 import OrderListView from '@/views/OrderListView.vue'
+import TestView from '@/views/TestView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,6 +69,11 @@ const router = createRouter({
       path: '/pay',
       name: 'pay',
       component: PayView,
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: TestView,
     },
   ],
 })
