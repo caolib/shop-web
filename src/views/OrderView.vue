@@ -39,13 +39,8 @@
       </div>
       <a-list>
         <!--地址行-->
-        <a-list-item
-          class="address-row"
-          v-for="address in addresses"
-          :key="address.id"
-          @click="selectAddress(address)"
-          :class="{ selected: address.id === selectedAddress.id }"
-        >
+        <a-list-item class="address-row" v-for="address in addresses" :key="address.id" @click="selectAddress(address)"
+          :class="{ selected: address.id === selectedAddress.id }">
           <!--地址信息-->
           <div class="address-info">
             <div>
@@ -57,27 +52,12 @@
 
             <!--地址操作-->
             <div class="address-actions">
-              <a-button
-                type="link"
-                size="small"
-                class="actions-btn"
-                v-if="!address.isDefault"
-                @click.stop="setDefaultAddress(address)"
-                >设为默认地址
+              <a-button type="link" size="small" class="actions-btn" v-if="!address.isDefault"
+                @click.stop="setDefaultAddress(address)">设为默认地址
               </a-button>
-              <a-button
-                type="link"
-                size="small"
-                class="actions-btn"
-                @click.stop="openUpdateAddr(address)"
-                >编辑
+              <a-button type="link" size="small" class="actions-btn" @click.stop="openUpdateAddr(address)">编辑
               </a-button>
-              <a-popconfirm
-                title="确定删除吗?"
-                ok-text="确定"
-                cancel-text="我再想想"
-                @confirm="deleteAddress(address)"
-              >
+              <a-popconfirm title="确定删除吗?" ok-text="确定" cancel-text="我再想想" @confirm="deleteAddress(address)">
                 <a-button type="link" size="small" class="actions-btn">删除</a-button>
               </a-popconfirm>
             </div>
@@ -97,10 +77,7 @@
       <!--选择的地址信息行-->
       <a-row style="margin-top: 10px">
         <a-col :span="20" style="color: grey">
-          <div
-            v-if="selectedAddress"
-            style="display: flex; gap: 10px; font-size: 12px; color: black"
-          >
+          <div v-if="selectedAddress" style="display: flex; gap: 10px; font-size: 12px; color: black">
             寄送至：
             <span>{{ selectedAddress.contact }}</span>
             <span>{{ selectedAddress.province }}</span>
@@ -111,31 +88,17 @@
           </div>
         </a-col>
         <a-col :span="4" style="text-align: right">
-          <a-button type="primary" size="large" :loading="loading" @click="submitOrder"
-            >提交订单
+          <a-button type="primary" size="large" :loading="loading" @click="submitOrder">提交订单
           </a-button>
         </a-col>
       </a-row>
     </div>
 
     <!-- 地址表单 -->
-    <a-modal
-      v-model:open="visible"
-      :title="title"
-      ok-text="确定"
-      cancel-text="取消"
-      @ok="addOrUpdateAddr"
-    >
+    <a-modal v-model:open="visible" :title="title" ok-text="确定" cancel-text="取消" @ok="addOrUpdateAddr">
       <a-form ref="formRef" :model="addressData" layout="horizontal" name="form_in_modal">
-        <a-form-item
-          v-for="(label, key) in formFields"
-          :key="key"
-          :name="key"
-          :label="label"
-          :rules="
-            key !== 'notes' ? [{ required: true, message: `请填写 ${label.toLowerCase()}!` }] : []
-          "
-        >
+        <a-form-item v-for="(label, key) in formFields" :key="key" :name="key" :label="label" :rules="key !== 'notes' ? [{ required: true, message: `请填写 ${label.toLowerCase()}!` }] : []
+          ">
           <a-input v-model:value="addressData[key]" />
         </a-form-item>
       </a-form>
@@ -194,16 +157,6 @@ const addressData = reactive({
   isDefault: 0,
   notes: '',
 })
-
-// const formFields = {
-//   province: '省',
-//   city: '市',
-//   town: '区/县',
-//   street: '街道',
-//   mobile: '手机',
-//   contact: '联系人',
-//   notes: '备注 ',
-// }
 
 const title = ref('新增地址')
 

@@ -16,7 +16,7 @@ import { checkSrv, getServiceStatus } from '@/api/status.js'
 import { useRoute } from 'vue-router'
 import { logout } from '@/api/login.js'
 import { flushUser, isLogin, user } from '@/api/app.js'
-import { goPage } from './router/jump'
+import { goPage, jump } from './router/jump'
 
 const route = useRoute()
 const isActive = (path) => route.path === path // 判断当前显示的页面
@@ -39,96 +39,93 @@ onMounted(() => {
 <template>
   <!--顶部导航栏-->
   <div class="top-navbar">
-    <a-breadcrumb separator=" ">
-      <!--回退-->
-      <a-breadcrumb-item class="actions" @click="goPage(-1)">
-        <ArrowLeftOutlined />
-      </a-breadcrumb-item>
-      <!--前进-->
-      <a-breadcrumb-item class="actions" @click="goPage(1)">
-        <ArrowRightOutlined />
-      </a-breadcrumb-item>
-      <!--首页-->
-      <a-breadcrumb-item>
-        <router-link to="/" :class="['route-link', { active: isActive('/') }]">
-          <home-outlined />
-          首页
-        </router-link>
-      </a-breadcrumb-item>
+    <div class="breadcrumb-container">
+      <div class="breadcrumb-left">
+        <a-breadcrumb separator=" ">
+          <!--首页-->
+          <a-breadcrumb-item :class="['route-link', { active: isActive('/') }]" @click="jump('/')">
+            <home-outlined />
+            首页
+          </a-breadcrumb-item>
 
-      <!--登录-->
-      <a-breadcrumb-item>
-        <router-link to="/user" :class="['route-link', { active: isActive('/user') }]">
-          <user-outlined />
-          <span v-if="isLogin"> 你好,{{ user.username }} </span>
-          <span v-else>
-            <router-link to="/login" :class="['route-link', { active: isActive('/login') }]">&nbsp;请登录
-            </router-link>
-          </span>
-        </router-link>
-      </a-breadcrumb-item>
+          <!--登录-->
+          <a-breadcrumb-item :class="['route-link', { active: isActive(isLogin ? '/user' : '/login') }]"
+            @click="jump(isLogin ? '/user' : '/login')">
+            <user-outlined />
+            <span v-if="isLogin">你好,{{ user.username }}</span>
+            <span v-else>请登录</span>
+          </a-breadcrumb-item>
 
-      <!--注册-->
-      <a-breadcrumb-item v-if="!isLogin">
-        <router-link to="/" :class="['route-link']">
-          <span>注册</span>
-        </router-link>
-      </a-breadcrumb-item>
+          <!--注册-->
+          <a-breadcrumb-item v-if="!isLogin" :class="['route-link', { active: isActive('/') }]" @click="jump('/')">
+            注册
+          </a-breadcrumb-item>
 
-      <!--搜索商品-->
-      <a-breadcrumb-item>
-        <router-link to="/search" :class="['route-link', { active: isActive('/search') }]">
-          <SearchOutlined />
-          搜索商品
-        </router-link>
-      </a-breadcrumb-item>
+          <!--搜索商品-->
+          <a-breadcrumb-item :class="['route-link', { active: isActive('/search') }]" @click="jump('/search')">
+            <SearchOutlined />
+            搜索
+          </a-breadcrumb-item>
 
-      <!--购物车-->
-      <a-breadcrumb-item>
-        <router-link to="/cart" :class="['route-link', { active: isActive('/cart') }]">
-          <ShoppingCartOutlined />
-          购物车
-        </router-link>
-      </a-breadcrumb-item>
+          <!--购物车-->
+          <a-breadcrumb-item :class="['route-link', { active: isActive('/cart') }]" @click="jump('/cart')">
+            <ShoppingCartOutlined />
+            购物车
+          </a-breadcrumb-item>
 
-      <!--我的订单-->
-      <a-breadcrumb-item>
-        <router-link to="/order-list" :class="['route-link', { active: isActive('/order-list') }]">
-          <FileTextOutlined />
-          我的订单
-        </router-link>
-      </a-breadcrumb-item>
+          <!--我的订单-->
+          <a-breadcrumb-item :class="['route-link', { active: isActive('/order-list') }]" @click="jump('/order-list')">
+            <FileTextOutlined />
+            我的订单
+          </a-breadcrumb-item>
 
-      <!--关于-->
-      <a-breadcrumb-item>
-        <router-link to="/about" :class="['route-link', { active: isActive('/about') }]">
-          <FileTextOutlined />
-          关于
-        </router-link>
-      </a-breadcrumb-item>
+          <!--关于-->
+          <a-breadcrumb-item :class="['route-link', { active: isActive('/about') }]" @click="jump('/about')">
+            <FileTextOutlined />
+            关于
+          </a-breadcrumb-item>
 
-      <!--退出登录-->
-      <a-breadcrumb-item v-if="isLogin" class="logout" @click="logout('')">
-        <LogoutOutlined />
-        退出登录
-      </a-breadcrumb-item>
+          <!--退出登录-->
+          <a-breadcrumb-item v-if="isLogin" :class="['route-link']" @click="logout('')">
+            <LogoutOutlined />
+            退出登录
+          </a-breadcrumb-item>
 
-      <!--服务状态-->
-      <a-breadcrumb-item>
-        <a-dropdown>
-          <CheckCircleFilled style="color: #00b96b" v-if="allServicesUp" />
-          <ExclamationCircleFilled style="color: #f30213" v-else />
-          <template #overlay>
-            <a-menu>
-              <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
-                <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{ status[0]
-                  }}</span>
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
-      </a-breadcrumb-item>
-    </a-breadcrumb>
+
+        </a-breadcrumb>
+      </div>
+      <div class="breadcrumb-right">
+        <a-breadcrumb separator=" ">
+          <!--服务状态-->
+          <a-breadcrumb-item :class="['route-link']">
+            <a-dropdown>
+              <CheckCircleFilled style="color: #00b96b" v-if="allServicesUp" />
+              <ExclamationCircleFilled style="color: #f30213" v-else />
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
+                    <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{
+                      status[0]
+                    }}</span>
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </a-breadcrumb-item>
+
+          <!--回退-->
+          <a-breadcrumb-item class="actions" @click="goPage(-1)">
+            <ArrowLeftOutlined />
+          </a-breadcrumb-item>
+
+          <!--前进-->
+          <a-breadcrumb-item class="actions" @click="goPage(1)">
+            <ArrowRightOutlined />
+          </a-breadcrumb-item>
+
+        </a-breadcrumb>
+      </div>
+    </div>
   </div>
 
   <!--路由页面-->
@@ -151,9 +148,25 @@ onMounted(() => {
   background: #e7e7e7;
 }
 
+.breadcrumb-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.route-link {
+  color: grey !important;
+  border: 1.5px solid transparent;
+  padding-right: 2px;
+  padding-left: 2px;
+}
+
 .route-link:hover,
 a:hover {
   color: @primary-color !important;
+  cursor: pointer;
+  border: 1.5px solid @primary-color;
+  border-radius: 5px;
 }
 
 .logout:hover {
@@ -163,13 +176,13 @@ a:hover {
 
 .actions {
   margin-right: 5px;
+  color: grey !important;
 }
 
 .actions:hover {
   border-radius: 5px;
   cursor: pointer;
-  color: @primary-color;
-  background: #d5d5d5;
+  color: @primary-color !important;
 }
 
 .active {
