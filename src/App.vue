@@ -97,7 +97,7 @@ onMounted(() => {
       <div class="breadcrumb-right">
         <a-breadcrumb separator=" ">
           <!--服务状态-->
-          <a-breadcrumb-item :class="['route-link']">
+          <a-breadcrumb-item class="actions">
             <a-dropdown>
               <CheckCircleFilled style="color: #00b96b" v-if="allServicesUp" />
               <ExclamationCircleFilled style="color: #f30213" v-else />
@@ -106,7 +106,7 @@ onMounted(() => {
                   <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
                     <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{
                       status[0]
-                    }}</span>
+                      }}</span>
                   </a-menu-item>
                 </a-menu>
               </template>

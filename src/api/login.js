@@ -36,18 +36,28 @@ const cancelAccountServicce = () => {
   return request.delete('/users')
 }
 
+/**
+ * 退出登录
+ */
+const logoutService = () => {
+  return request.get('/users/logout')
+}
 
 
 // 退出登录
-const logout = (msg) => {
-  console.log(msg)
-  //TODO 退出登录，后端删除用户相关信息和token
-  const userInfo = useUserStore()
-  userInfo.clearUser()
-  jump('/login')
-  msg = msg !== '' ? msg : '成功退出登录'
-  message.success(msg)
-  isLogin.value = false
+const logout = async (msg) => {
+  // console.log(msg)
+  const hide = message.loading('正在退出登录...', 0)
+  await logoutService().then(() => {
+    const userInfo = useUserStore()
+    userInfo.clearUser()
+    jump('/login')
+    msg = msg !== '' ? msg : '成功退出登录'
+    message.success(msg)
+    isLogin.value = false
+  }).finally(() => {
+    hide()
+  })
 }
 
 export {
