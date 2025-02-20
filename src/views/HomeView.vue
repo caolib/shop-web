@@ -94,7 +94,7 @@ const handleSearchClick = () => {
 
 /* 搜索框 */
 .search-input {
-  //background: @primary-color;
+  margin-left: 15px;
   width: 100%;
   height: 100px;
   display: flex;
@@ -103,10 +103,11 @@ const handleSearchClick = () => {
 
 /* 商品分类菜单 */
 .commodity-classify {
-  background: #f0f2f5;
   height: auto;
   width: 20vw;
   float: left;
+  position: sticky;
+  top: 30px;
 }
 
 ul.ant-menu.ant-menu-root.ant-menu-inline {

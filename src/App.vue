@@ -106,7 +106,7 @@ onMounted(() => {
                   <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
                     <span @click="checkSrv(status[0])" :style="{ color: status[1] ? '#00b96b' : '#f30213' }">{{
                       status[0]
-                      }}</span>
+                    }}</span>
                   </a-menu-item>
                 </a-menu>
               </template>
@@ -139,7 +139,7 @@ onMounted(() => {
 @import '@/styles/var';
 
 .top-navbar {
-  padding: 10px 20px;
+  padding: 3px;
   height: auto;
   position: fixed;
   top: 0;
@@ -157,8 +157,7 @@ onMounted(() => {
 .route-link {
   color: grey !important;
   border: 1.5px solid transparent;
-  padding-right: 2px;
-  padding-left: 2px;
+  padding: 3px;
 }
 
 .route-link:hover,
