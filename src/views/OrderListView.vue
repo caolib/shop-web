@@ -9,11 +9,12 @@ import { jumpToItem, jumpToPay } from '@/router/jump';
 const orders = ref([]); // 订单信息
 
 // 删除订单
-const deleteOrder = async (id) => {
-  const hide = message.loading('删除中...', 0); // 0 表示不会自动关闭
-  await deleteOrdersService([id]).then(() => {
+const deleteOrders = async (ids) => {
+  const hide = message.loading('删除中...', 0);
+  await deleteOrdersService(ids).then(() => {
     message.success('删除成功');
     initOrders();
+    selectedRowKeys.value = []; // 清空选中项
   }).finally(() => {
     hide();
   });
@@ -22,6 +23,11 @@ const deleteOrder = async (id) => {
 const tableKey = ref(Date.now());
 const selectedRowKeys = ref([]); // 选中的行
 
+// 更新选中项
+const onSelectChange = (newSelectedRowKeys) => {
+  selectedRowKeys.value = newSelectedRowKeys;
+  console.log(selectedRowKeys.value);
+};
 
 // 初始化订单信息
 const initOrders = async () => {
@@ -40,11 +46,16 @@ onMounted(async () => {
 
 <template>
   <div class="container">
-    <h2>用户订单</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 10px;">
+      <h2>用户订单</h2>
+      <a-button v-if="selectedRowKeys.length > 1" type="primary" danger @click="deleteOrders(selectedRowKeys)">
+        删除选中
+      </a-button>
+    </div>
     <!-- 订单信息表格 -->
-    <a-table :key="tableKey" class="order-tb" :columns="orderColumns" :dataSource="orders" bordered
-      :defaultExpandAllRows="true" :rowSelection="selectedRowKeys" :expandIconAsCell="false" :expandIconColumnIndex="-1"
-      row-class-name="tb-row">
+    <a-table :key="tableKey" class="order-tb" :columns="orderColumns" :dataSource="orders" row-key="id"
+      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" bordered
+      :defaultExpandAllRows="true" :expandIconAsCell="false" :expandIconColumnIndex="-1" row-class-name="tb-row">
 
       <!-- 自定义渲染格式 -->
       <template #bodyCell="{ column, text, record }">
@@ -58,7 +69,7 @@ onMounted(async () => {
           <div style="display:flex;padding: 5px;gap:10px;">
             <a-button v-if="record.status === '1'" type="primary" size="small"
               @click="jumpToPay(record.id)">支付</a-button>
-            <a-popconfirm title="确定删除该订单吗?" @confirm="deleteOrder(record.id)" ok-text="确定" cancel-text="取消">
+            <a-popconfirm title="确定删除该订单吗?" @confirm="deleteOrders([record.id])" ok-text="确定" cancel-text="取消">
               <a-button danger type="link" size="small">删除</a-button>
             </a-popconfirm>
           </div>
@@ -66,7 +77,7 @@ onMounted(async () => {
 
       </template>
 
-      <!-- 折叠区域-商品子表格 -->
+      <!-- 商品子表格 -->
       <template #expandedRowRender="{ record }">
         <a-table class="commodity-tb" :columns="commodityColumns" :dataSource="record.orderDetails" bordered
           :pagination="false">
@@ -133,8 +144,10 @@ a.item-name {
   font-size: 12px;
 }
 
+/* 表格行 */
+:deep(.tb-row:hover) td,
 :deep(.tb-row) td {
-  background-color: @tb-row-bg;
+  background-color: @tb-row-bg !important;
 }
 
 .hidden-column {
