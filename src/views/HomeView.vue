@@ -6,12 +6,16 @@ import { jumpToItem, jumpWithQuery } from '@/router/jump'
 
 const commodity = ref([]) // 商品列表
 const key = ref('') // 搜索关键字
+const loading = ref(false) // 商品加载状态
 
 // 搜索主页商品
 const search = async () => {
+  loading.value = true
   await searchHomeService().then((res) => {
     // console.log(res)
     commodity.value = res.list
+  }).finally(() => {
+    loading.value = false
   })
 }
 
@@ -48,7 +52,7 @@ const handleSearchClick = () => {
       <div class="commodity-classify">
         <a-menu mode="inline" theme="light" default-selected-keys="1">
           <a-menu-item v-for="menuItem in menuItems" :key="menuItem.key">
-            <a-breadcrumb>
+            <a-breadcrumb separator=" ">
               <component :is="menuItem.icon" class="breadcrumb-icon" />
               <a-breadcrumb-item class="commodity-item" v-for="item in menuItem.items" :key="item"
                 @click="handleClick(item)">
@@ -61,23 +65,25 @@ const handleSearchClick = () => {
 
       <!--商品展示卡片-->
       <div class="commodity-display">
-        <a-row>
-          <a-col :span="6" v-for="item in commodity" :key="item.id">
-            <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
-              <template #cover>
-                <img :src="item.image" alt="" />
-              </template>
-              <a-card-meta>
-                <template #title>
-                  <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+        <a-spin :spinning="loading" tip="加载中...">
+          <a-row>
+            <a-col :span="6" v-for="item in commodity" :key="item.id">
+              <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
+                <template #cover>
+                  <img :src="item.image" alt="" />
                 </template>
-                <template #description>
-                  <span style="color: black">{{ item.name }}</span>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </a-col>
-        </a-row>
+                <a-card-meta>
+                  <template #title>
+                    <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+                  </template>
+                  <template #description>
+                    <span style="color: black">{{ item.name }}</span>
+                  </template>
+                </a-card-meta>
+              </a-card>
+            </a-col>
+          </a-row>
+        </a-spin>
       </div>
     </div>
 
@@ -103,6 +109,7 @@ const handleSearchClick = () => {
 
 /* 商品分类菜单 */
 .commodity-classify {
+  z-index: 10;
   height: auto;
   width: 20vw;
   float: left;
@@ -118,6 +125,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline {
 /* 商品分类悬浮高亮 */
 .ant-breadcrumb li:last-child:hover,
 .commodity-item:hover {
+  cursor: pointer;
   color: @primary-color;
 }
 

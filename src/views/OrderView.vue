@@ -1,111 +1,3 @@
-<template>
-  <div class="order-view-body">
-    <h2>订单确认</h2>
-
-    <!--商品卡片展示-->
-    <div class="commodity-display">
-      <a-row>
-        <a-col :span="4" v-for="item in selectedItems" :key="item.id">
-          <a-card class="commodity-card" hoverable @click="jumpToItem(item.itemId)">
-            <!-- 封面 -->
-            <template #cover>
-              <div style="display: flex; justify-content: center; margin-top: 5px">
-                <img :src="item.image" style="width: 100px" alt="" />
-              </div>
-            </template>
-            <a-card-meta>
-              <!-- 价格 -->
-              <template #title>
-                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
-              </template>
-              <!-- 商品描述 -->
-              <template #description>
-                <span class="commodity-desc">{{ item.name }}</span>
-                <div style="margin-top: 10px">
-                  <span style="color: #00b96b">{{ item.num }}件</span>
-                </div>
-              </template>
-            </a-card-meta>
-          </a-card>
-        </a-col>
-      </a-row>
-    </div>
-
-    <!-- 收货地址列表 -->
-    <div class="address-list">
-      <div style="display: flex; justify-content: space-between; align-items: center">
-        <h3>收货人信息</h3>
-        <a-button type="link" size="small" @click="openAddr">新增地址</a-button>
-      </div>
-      <a-list>
-        <!--地址行-->
-        <a-list-item class="address-row" v-for="address in addresses" :key="address.id" @click="selectAddress(address)"
-          :class="{ selected: address.id === selectedAddress.id }">
-          <!--地址信息-->
-          <div class="address-info">
-            <div>
-              {{ address.notes }}
-              {{ address.contact }} {{ address.province }} {{ address.city }} {{ address.town }}
-              {{ address.street }} {{ address.mobile }}
-              <a-tag v-if="address.isDefault" class="default-tag">默认地址</a-tag>
-            </div>
-
-            <!--地址操作-->
-            <div class="address-actions">
-              <a-button type="link" size="small" class="actions-btn" v-if="!address.isDefault"
-                @click.stop="setDefaultAddress(address)">设为默认地址
-              </a-button>
-              <a-button type="link" size="small" class="actions-btn" @click.stop="openUpdateAddr(address)">编辑
-              </a-button>
-              <a-popconfirm title="确定删除吗?" ok-text="确定" cancel-text="我再想想" @confirm="deleteAddress(address)">
-                <a-button type="link" size="small" class="actions-btn">删除</a-button>
-              </a-popconfirm>
-            </div>
-          </div>
-        </a-list-item>
-      </a-list>
-    </div>
-
-    <!--结算栏-->
-    <div class="order-footer">
-      <!--总价格行-->
-      <a-row>
-        <a-col :span="12" style="color: grey">
-          应付总额：<span class="price">￥{{ total }}</span>
-        </a-col>
-      </a-row>
-      <!--选择的地址信息行-->
-      <a-row style="margin-top: 10px">
-        <a-col :span="20" style="color: grey">
-          <div v-if="selectedAddress" style="display: flex; gap: 10px; font-size: 12px; color: black">
-            寄送至：
-            <span>{{ selectedAddress.contact }}</span>
-            <span>{{ selectedAddress.province }}</span>
-            <span>{{ selectedAddress.city }}</span>
-            <span>{{ selectedAddress.town }}</span>
-            <span>{{ selectedAddress.street }}</span>
-            收货人：{{ selectedAddress.contact }} {{ selectedAddress.mobile }}
-          </div>
-        </a-col>
-        <a-col :span="4" style="text-align: right">
-          <a-button type="primary" size="large" :loading="loading" @click="submitOrder">提交订单
-          </a-button>
-        </a-col>
-      </a-row>
-    </div>
-
-    <!-- 地址表单 -->
-    <a-modal v-model:open="visible" :title="title" ok-text="确定" cancel-text="取消" @ok="addOrUpdateAddr">
-      <a-form ref="formRef" :model="addressData" layout="horizontal" name="form_in_modal">
-        <a-form-item v-for="(label, key) in formFields" :key="key" :name="key" :label="label" :rules="key !== 'notes' ? [{ required: true, message: `请填写 ${label.toLowerCase()}!` }] : []
-          ">
-          <a-input v-model:value="addressData[key]" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted, computed, reactive, toRaw } from 'vue'
 import { useOrderStore } from '@/stores/order.js'
@@ -139,10 +31,13 @@ const selectedAddress = ref(null) // 选择的地址
 
 // 查询用户地址
 const queryAddress = async () => {
+  const hide = message.loading('查询地址中...', 0)
   await getAddressService().then((res) => {
     addresses.value = res
     selectedAddress.value =
       addresses.value.find((address) => address.isDefault) || addresses.value[0]
+  }).finally(() => {
+    hide()
   })
 }
 
@@ -259,6 +154,116 @@ const submitOrder = async () => {
     })
 }
 </script>
+
+<template>
+  <div class="order-view-body">
+    <h2>订单确认</h2>
+
+    <!--商品卡片展示-->
+    <div class="commodity-display">
+      <a-row>
+        <a-col :span="4" v-for="item in selectedItems" :key="item.id">
+          <a-card class="commodity-card" hoverable @click="jumpToItem(item.itemId)">
+            <!-- 封面 -->
+            <template #cover>
+              <div style="display: flex; justify-content: center; margin-top: 5px">
+                <img :src="item.image" style="width: 100px" alt="" />
+              </div>
+            </template>
+            <a-card-meta>
+              <!-- 价格 -->
+              <template #title>
+                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+              </template>
+              <!-- 商品描述 -->
+              <template #description>
+                <span class="commodity-desc">{{ item.name }}</span>
+                <div style="margin-top: 10px">
+                  <span style="color: #00b96b">{{ item.num }}件</span>
+                </div>
+              </template>
+            </a-card-meta>
+          </a-card>
+        </a-col>
+      </a-row>
+    </div>
+
+    <!-- 收货地址列表 -->
+    <div class="address-list">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h3>收货人信息</h3>
+        <a-button type="link" size="small" @click="openAddr">新增地址</a-button>
+      </div>
+      <a-list>
+        <!--地址行-->
+        <a-list-item class="address-row" v-for="address in addresses" :key="address.id" @click="selectAddress(address)"
+          :class="{ selected: address.id === selectedAddress.id }">
+          <!--地址信息-->
+          <div class="address-info">
+            <div>
+              {{ address.notes }}
+              {{ address.contact }} {{ address.province }} {{ address.city }} {{ address.town }}
+              {{ address.street }} {{ address.mobile }}
+              <a-tag v-if="address.isDefault" class="default-tag">默认地址</a-tag>
+            </div>
+
+            <!--地址操作-->
+            <div class="address-actions">
+              <a-button type="link" size="small" class="actions-btn" v-if="!address.isDefault"
+                @click.stop="setDefaultAddress(address)">设为默认地址
+              </a-button>
+              <a-button type="link" size="small" class="actions-btn" @click.stop="openUpdateAddr(address)">编辑
+              </a-button>
+              <a-popconfirm title="确定删除吗?" ok-text="确定" cancel-text="我再想想" @confirm="deleteAddress(address)">
+                <a-button type="link" size="small" class="actions-btn">删除</a-button>
+              </a-popconfirm>
+            </div>
+          </div>
+        </a-list-item>
+      </a-list>
+    </div>
+
+    <!--结算栏-->
+    <div class="order-footer">
+      <!--总价格行-->
+      <a-row>
+        <a-col :span="12" style="color: grey">
+          应付总额：<span class="price">￥{{ total }}</span>
+        </a-col>
+      </a-row>
+      <!--选择的地址信息行-->
+      <a-row style="margin-top: 10px">
+        <a-col :span="20" style="color: grey">
+          <div v-if="selectedAddress" style="display: flex; gap: 10px; font-size: 12px; color: black">
+            寄送至：
+            <span>{{ selectedAddress.contact }}</span>
+            <span>{{ selectedAddress.province }}</span>
+            <span>{{ selectedAddress.city }}</span>
+            <span>{{ selectedAddress.town }}</span>
+            <span>{{ selectedAddress.street }}</span>
+            收货人：{{ selectedAddress.contact }} {{ selectedAddress.mobile }}
+          </div>
+        </a-col>
+        <a-col :span="4" style="text-align: right">
+          <a-button type="primary" size="large" :loading="loading" @click="submitOrder">提交订单
+          </a-button>
+        </a-col>
+      </a-row>
+    </div>
+
+    <!-- 地址表单 -->
+    <a-modal v-model:open="visible" :title="title" ok-text="确定" cancel-text="取消" @ok="addOrUpdateAddr">
+      <a-form ref="formRef" :model="addressData" layout="horizontal" name="form_in_modal">
+        <a-form-item v-for="(label, key) in formFields" :key="key" :name="key" :label="label" :rules="key !== 'notes' ? [{ required: true, message: `请填写 ${label.toLowerCase()}!` }] : []
+          ">
+          <a-input v-model:value="addressData[key]" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+  </div>
+</template>
+
+
 
 <style scoped lang="less">
 @import '@/styles/var';

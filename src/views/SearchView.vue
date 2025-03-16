@@ -5,18 +5,25 @@ import router from '@/router/index.js'
 import { jumpToItem } from '@/router/jump'
 import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons-vue'
 import { handleImageError } from '@/utils/handleImg.js'
+import { message } from 'ant-design-vue'
 
 const commodity = ref([]) // 商品列表
 const total = ref(0) // 商品总数
+const loading = ref(false) // 商品加载状态
 
 // 搜索商品信息
 const searchCommodity = async () => {
+  const hide = message.loading('搜索中...', 0)
+  loading.value = true
   const paramsCopy = Object.assign({}, searchParams);
   // console.log('params:', paramsCopy)
   await searchService(paramsCopy).then((res) => {
     commodity.value = res.list
     total.value = res.total
     // console.log(res)
+  }).finally(() => {
+    hide()
+    loading.value = false
   })
 }
 
@@ -214,34 +221,36 @@ const sortOptions = [
 
     <!--商品卡片展示-->
     <div class="commodity-display">
-      <a-row>
-        <a-empty style="width: 90vw;" v-if="commodity.length === 0" />
-        <a-col :span="4" v-for="item in commodity" :key="item.id">
-          <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
-            <!-- 封面 -->
-            <template #cover>
-              <img :src="item.image" :alt="item.name" @error="handleImageError" />
-            </template>
-            <a-card-meta>
-              <!-- 价格 -->
-              <template #title>
-                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+      <a-spin :spinning="loading" tip="加载中...">
+        <a-row>
+          <a-empty style="width: 90vw;" v-if="commodity.length === 0" />
+          <a-col :span="4" v-for="item in commodity" :key="item.id">
+            <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
+              <!-- 封面 -->
+              <template #cover>
+                <img :src="item.image" :alt="item.name" @error="handleImageError" />
               </template>
-              <!-- 商品描述 -->
-              <template #description>
-                <span class="commodity-desc">{{ item.name }}</span>
-                <div style="margin-top: 5px;">
-                  <span>已售出：{{ item.sold }}</span>
-                </div>
-                <div style="margin-top: 5px;">
-                  <span>{{ item.commentCount }} 条评论</span>
-                </div>
-              </template>
+              <a-card-meta>
+                <!-- 价格 -->
+                <template #title>
+                  <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+                </template>
+                <!-- 商品描述 -->
+                <template #description>
+                  <span class="commodity-desc">{{ item.name }}</span>
+                  <div style="margin-top: 5px;">
+                    <span>已售出：{{ item.sold }}</span>
+                  </div>
+                  <div style="margin-top: 5px;">
+                    <span>{{ item.commentCount }} 条评论</span>
+                  </div>
+                </template>
 
-            </a-card-meta>
-          </a-card>
-        </a-col>
-      </a-row>
+              </a-card-meta>
+            </a-card>
+          </a-col>
+        </a-row>
+      </a-spin>
     </div>
 
   </div>

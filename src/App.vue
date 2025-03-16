@@ -86,7 +86,7 @@ onMounted(() => {
           </a-breadcrumb-item>
 
           <!--退出登录-->
-          <a-breadcrumb-item v-if="isLogin" :class="['route-link']" @click="logout('')">
+          <a-breadcrumb-item v-if="isLogin" :class="['logout', 'route-link']" @click="logout('')">
             <LogoutOutlined />
             退出登录
           </a-breadcrumb-item>
@@ -139,7 +139,7 @@ onMounted(() => {
 @import '@/styles/var';
 
 .top-navbar {
-  padding: 3px;
+  padding: 5px;
   height: auto;
   position: fixed;
   top: 0;
@@ -154,23 +154,19 @@ onMounted(() => {
   align-items: center;
 }
 
-.route-link {
-  color: grey !important;
-  border: 1.5px solid transparent;
-  padding: 3px;
+.ant-breadcrumb li:last-child {
+  color: grey;
+}
+
+.logout:hover {
+  color: @red !important;
 }
 
 .route-link:hover,
 a:hover {
-  color: @primary-color !important;
+  color: @primary-color;
   cursor: pointer;
-  border: 1.5px solid @primary-color;
   border-radius: 5px;
-}
-
-.logout:hover {
-  cursor: pointer;
-  color: @red;
 }
 
 .actions {
