@@ -29,13 +29,16 @@ const onSelectChange = (newSelectedRowKeys) => {
   console.log(selectedRowKeys.value);
 };
 
-// 初始化订单信息
+// 查询订单信息
 const initOrders = async () => {
+  const hide = message.loading('查询订单中...', 0)
   await getUserOrdersService().then((response) => {
-    orders.value = response.data;
-    tableKey.value = Date.now();
-  });
-};
+    orders.value = response.data
+    tableKey.value = Date.now()
+  }).finally(() => {
+    hide()
+  })
+}
 
 onMounted(async () => {
   await initOrders();
