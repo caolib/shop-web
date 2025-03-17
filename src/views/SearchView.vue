@@ -5,7 +5,6 @@ import router from '@/router/index.js'
 import { jumpToItem } from '@/router/jump'
 import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons-vue'
 import { handleImageError } from '@/utils/handleImg.js'
-import { message } from 'ant-design-vue'
 
 const commodity = ref([]) // 商品列表
 const total = ref(0) // 商品总数
@@ -13,7 +12,6 @@ const loading = ref(false) // 商品加载状态
 
 // 搜索商品信息
 const searchCommodity = async () => {
-  const hide = message.loading('搜索中...', 0)
   loading.value = true
   const paramsCopy = Object.assign({}, searchParams);
   // console.log('params:', paramsCopy)
@@ -22,7 +20,6 @@ const searchCommodity = async () => {
     total.value = res.total
     // console.log(res)
   }).finally(() => {
-    hide()
     loading.value = false
   })
 }
@@ -148,7 +145,7 @@ const sortOptions = [
         <div>
           <span v-for="cate in presetCategories" :key="cate" @click="setCategory(cate)" class="condition-row-item">{{
             cate
-          }}</span>
+            }}</span>
         </div>
       </a-row>
 
@@ -159,7 +156,7 @@ const sortOptions = [
           style="width: 10vw;" />
         <div>
           <span v-for="brand in presetBrands" :key="brand" @click="setBrand(brand)" class="condition-row-item">{{ brand
-            }}</span>
+          }}</span>
         </div>
       </a-row>
 
@@ -208,7 +205,7 @@ const sortOptions = [
           <!-- 条件标签 -->
           <a-tag v-if="searchParams.brand" closable @close="setBrand('')">{{ searchParams.brand }}</a-tag>
           <a-tag v-if="searchParams.category" closable @close="setCategory('')">{{ searchParams.category
-            }}</a-tag>
+          }}</a-tag>
           <a-tag v-if="priceTag" closable @close="resetPrice">
             {{ priceTag }}
           </a-tag>
