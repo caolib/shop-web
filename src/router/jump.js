@@ -1,4 +1,11 @@
+import { message } from "ant-design-vue"
 import router from "."
+
+// 跳转到登录界面
+const jumpToLogin = (msg) => {
+    message.error(msg)
+    router.push('/login')
+}
 
 // 跳转到指定页面
 const jump = (path) => {
@@ -15,8 +22,6 @@ const jumpToPay = (orderId) => {
     router.push({ path: '/pay', query: { orderId } })
 }
 
-
-
 // 跳转到指定页面并携带参数
 const jumpWithQuery = (path, query) => {
     router.push({ path, query })
@@ -29,6 +34,7 @@ const goPage = (num) => {
 
 
 export {
+    jumpToLogin,
     jumpToItem,
     jump,
     jumpToPay,

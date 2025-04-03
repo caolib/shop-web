@@ -244,8 +244,6 @@ const submitOrder = async () => {
     details: orderDetails,
   }
 
-  // console.log('订单信息:', orderForm)
-
   // 创建订单
   await createOrderService(orderForm)
     .then((res) => {

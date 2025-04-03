@@ -8,15 +8,18 @@ import { handleImageError } from '@/utils/handleImg.js'
 
 const commodity = ref([]) // 商品列表
 const total = ref(0) // 商品总数
+const loading = ref(false) // 加载状态
 
 // 搜索商品信息
 const searchCommodity = async () => {
+  loading.value = true
   const paramsCopy = Object.assign({}, searchParams);
   // console.log('params:', paramsCopy)
   await searchService(paramsCopy).then((res) => {
     commodity.value = res.list
     total.value = res.total
-    // console.log(res)
+  }).finally(() => {
+    loading.value = false
   })
 }
 
@@ -152,7 +155,7 @@ const sortOptions = [
           style="width: 10vw;" />
         <div>
           <span v-for="brand in presetBrands" :key="brand" @click="setBrand(brand)" class="condition-row-item">{{ brand
-            }}</span>
+          }}</span>
         </div>
       </a-row>
 
@@ -201,7 +204,7 @@ const sortOptions = [
           <!-- 条件标签 -->
           <a-tag v-if="searchParams.brand" closable @close="setBrand('')">{{ searchParams.brand }}</a-tag>
           <a-tag v-if="searchParams.category" closable @close="setCategory('')">{{ searchParams.category
-            }}</a-tag>
+          }}</a-tag>
           <a-tag v-if="priceTag" closable @close="resetPrice">
             {{ priceTag }}
           </a-tag>
@@ -213,36 +216,38 @@ const sortOptions = [
     </div>
 
     <!--商品卡片展示-->
-    <div class="commodity-display">
-      <a-row>
-        <a-empty style="width: 90vw;" v-if="commodity.length === 0" />
-        <a-col :span="4" v-for="item in commodity" :key="item.id">
-          <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
-            <!-- 封面 -->
-            <template #cover>
-              <img :src="item.image" :alt="item.name" @error="handleImageError" />
-            </template>
-            <a-card-meta>
-              <!-- 价格 -->
-              <template #title>
-                <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+    <a-spin :spinning="loading">
+      <div class="commodity-display">
+        <a-row>
+          <a-empty style="width: 90vw;" v-if="commodity.length === 0" />
+          <a-col :span="4" v-for="item in commodity" :key="item.id">
+            <a-card class="commodity-card" hoverable @click="jumpToItem(item.id)">
+              <!-- 封面 -->
+              <template #cover>
+                <img :src="item.image" :alt="item.name" @error="handleImageError" />
               </template>
-              <!-- 商品描述 -->
-              <template #description>
-                <span class="commodity-desc">{{ item.name }}</span>
-                <div style="margin-top: 5px;">
-                  <span>已售出：{{ item.sold }}</span>
-                </div>
-                <div style="margin-top: 5px;">
-                  <span>{{ item.commentCount }} 条评论</span>
-                </div>
-              </template>
+              <a-card-meta>
+                <!-- 价格 -->
+                <template #title>
+                  <span class="price">￥{{ (item.price / 100).toFixed(2) }}</span>
+                </template>
+                <!-- 商品描述 -->
+                <template #description>
+                  <span class="commodity-desc">{{ item.name }}</span>
+                  <div style="margin-top: 5px;">
+                    <span>已售出：{{ item.sold }}</span>
+                  </div>
+                  <div style="margin-top: 5px;">
+                    <span>{{ item.commentCount }} 条评论</span>
+                  </div>
+                </template>
 
-            </a-card-meta>
-          </a-card>
-        </a-col>
-      </a-row>
-    </div>
+              </a-card-meta>
+            </a-card>
+          </a-col>
+        </a-row>
+      </div>
+    </a-spin>
 
   </div>
 </template>
