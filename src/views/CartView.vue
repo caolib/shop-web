@@ -17,9 +17,12 @@ const orderStore = useOrderStore() // 订单 store
 
 // 查询用户购物车
 const queryCart = async () => {
+  const hide = message.loading('查询购物车中...', 0)
   await getCartService().then((res) => {
     // console.log(res);
     cartData.value = res
+  }).finally(() => {
+    hide()
   })
 }
 

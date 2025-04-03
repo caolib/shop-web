@@ -9,6 +9,7 @@ import { cancelAccountServicce, logout } from '@/api/login';
 
 const user = ref({}); // 用户信息
 const avatarUrl = ref(avatarImage);
+const userLoading = ref(false); // 用户信息加载状态
 
 const pwdForm = reactive({
   oldPwd: '',
@@ -21,11 +22,14 @@ onMounted(() => {
 
 // 获取用户信息
 const fetchUser = async () => {
+  userLoading.value = true;
   await getUserInfoService().then(res => {
     user.value = res.data;
     if (user.value.avatar_url) {
       avatarUrl.value = user.value.avatar_url;
     }
+  }).finally(() => {
+    userLoading.value = false;
   })
 }
 
@@ -73,24 +77,26 @@ const cancelAccount = async () => {
 <template>
   <div class="container">
     <!-- 用户信息 -->
-    <a-card hoverable class="user-card">
-      <!-- 用户名 -->
-      <a-card-meta :title="user.username">
-        <!-- 头像 -->
-        <template #avatar>
-          <a-avatar style="margin-bottom: 20px;" :src="avatarUrl" />
-        </template>
-      </a-card-meta>
+    <a-spin :spinning="userLoading" tip="加载中...">
+      <a-card hoverable class="user-card">
+        <!-- 用户名 -->
+        <a-card-meta :title="user.username">
+          <!-- 头像 -->
+          <template #avatar>
+            <a-avatar style="margin-bottom: 20px;" :src="avatarUrl" />
+          </template>
+        </a-card-meta>
 
-      <p>电话: {{ user.phone }}</p>
-      <p>余额: {{ (user.balance / 100).toFixed(2) }} 元</p>
-      <p v-if="user.provider === 'github'">已绑定：
-        <GithubFilled style="margin-right: 10px;" />{{ user.oauth_name }}
-      </p>
-      <a-button @click="openPwdForm" size="small">修改密码</a-button>
-      <a-button @click="visible2 = true" :loading="loading" danger style="margin-left: 10px;" size="small"
-        type="primary">注销账号</a-button>
-    </a-card>
+        <p>电话: {{ user.phone }}</p>
+        <p>余额: {{ (user.balance / 100).toFixed(2) }} 元</p>
+        <p v-if="user.provider === 'github'">已绑定：
+          <GithubFilled style="margin-right: 10px;" />{{ user.oauth_name }}
+        </p>
+        <a-button @click="openPwdForm" size="small">修改密码</a-button>
+        <a-button @click="visible2 = true" :loading="loading" danger style="margin-left: 10px;" size="small"
+          type="primary">注销账号</a-button>
+      </a-card>
+    </a-spin>
 
     <!-- 修改密码对话框 -->
     <a-modal v-model:open="visible" @ok="updatePwd" title="修改密码" centered>

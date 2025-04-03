@@ -8,7 +8,7 @@ import { handleImageError } from '@/utils/handleImg.js'
 
 const commodity = ref([]) // 商品列表
 const total = ref(0) // 商品总数
-const loading = ref(false) // 加载状态
+const loading = ref(false) // 商品加载状态
 
 // 搜索商品信息
 const searchCommodity = async () => {
@@ -18,6 +18,7 @@ const searchCommodity = async () => {
   await searchService(paramsCopy).then((res) => {
     commodity.value = res.list
     total.value = res.total
+    // console.log(res)
   }).finally(() => {
     loading.value = false
   })
@@ -144,7 +145,7 @@ const sortOptions = [
         <div>
           <span v-for="cate in presetCategories" :key="cate" @click="setCategory(cate)" class="condition-row-item">{{
             cate
-          }}</span>
+            }}</span>
         </div>
       </a-row>
 
