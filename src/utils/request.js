@@ -3,6 +3,7 @@ import router from '@/router'
 
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo'
+import { jumpToLogin } from '@/router/jump'
 
 const baseURL = import.meta.env.VITE_APP_BASE_API
 const instance = axios.create({ baseURL })
@@ -23,17 +24,25 @@ instance.interceptors.response.use(
     const code = result.data.code
     const msg = result.data.msg
     if (code === undefined || code === 200 || code >= 1000) return result.data
-    // 异常处理
-    if (code === 400) {
-      message.error(msg);
-    } else if (code === 401) {
-      message.error('请先登录！');
-      router.push('/login');
-    } else if (code === 500) {
-      message.error(msg);
-      console.log(msg);
-    } else {
-      message.error('未知异常！' + code);
+
+    // 使用 switch 替换 if-else 语句
+    switch (code) {
+      case 400:
+        message.error(msg);
+        break;
+      case 401:
+        jumpToLogin('请先登录！');
+        break;
+      case 499:
+        jumpToLogin('身份过期,请重新登录！');
+        break;
+      case 500:
+        message.error(msg);
+        console.log(msg);
+        break;
+      default:
+        message.error('未知异常！' + code);
+        break;
     }
     return Promise.reject(result)
   },
@@ -51,8 +60,7 @@ instance.interceptors.response.use(
         message.error(msg)
         break
       case 401:
-        message.error('请先登录！')
-        router.push('/login')
+        jumpToLogin('请先登录！')
         break
       case 403:
         message.error('禁止访问！')
@@ -61,8 +69,7 @@ instance.interceptors.response.use(
         message.error('请求过于频繁，请稍后再试！')
         break
       case 499:
-        message.error('身份过期,请重新登录！')
-        router.push('/login')
+        jumpToLogin('身份过期,请重新登录！')
         break
       case 500:
       case 503:
@@ -97,8 +104,7 @@ instance.interceptors.request.use(
     const token = user.token
     // 未登录
     if (user == null || token == null) {
-      message.error('请先登录！')
-      router.push('/login')
+      jumpToLogin('未登录！')
       return Promise.reject('token不存在！')
     }
 

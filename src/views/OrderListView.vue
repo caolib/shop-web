@@ -49,9 +49,9 @@ onMounted(async () => {
 
 <template>
   <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 10px;">
       <h2>用户订单</h2>
-      <a-button v-if="selectedRowKeys.length > 1" danger @click="deleteOrders(selectedRowKeys)">
+      <a-button v-if="selectedRowKeys.length > 1" type="primary" danger @click="deleteOrders(selectedRowKeys)">
         删除选中
       </a-button>
     </div>
@@ -59,7 +59,6 @@ onMounted(async () => {
     <a-table :key="tableKey" class="order-tb" :columns="orderColumns" :dataSource="orders" row-key="id"
       :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" bordered
       :defaultExpandAllRows="true" :expandIconAsCell="false" :expandIconColumnIndex="-1" row-class-name="tb-row">
-
       <!-- 自定义渲染格式 -->
       <template #bodyCell="{ column, text, record }">
         <!-- 状态 -->
@@ -73,7 +72,7 @@ onMounted(async () => {
             <a-button v-if="record.status === '1'" type="primary" size="small"
               @click="jumpToPay(record.id)">支付</a-button>
             <a-popconfirm title="确定删除该订单吗?" @confirm="deleteOrders([record.id])" ok-text="确定" cancel-text="取消">
-              <a-button danger type="link" size="small">删除</a-button>
+              <a-button danger type="primary" size="small">删除</a-button>
             </a-popconfirm>
           </div>
         </template>
