@@ -59,10 +59,6 @@ onMounted(async () => {
     <a-table :key="tableKey" class="order-tb" :columns="orderColumns" :dataSource="orders" row-key="id"
       :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" bordered
       :defaultExpandAllRows="true" :expandIconAsCell="false" :expandIconColumnIndex="-1" row-class-name="tb-row">
-    <a-table :key="tableKey" class="order-tb" :columns="orderColumns" :dataSource="orders" row-key="id"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" bordered
-      :defaultExpandAllRows="true" :expandIconAsCell="false" :expandIconColumnIndex="-1" row-class-name="tb-row">
-
       <!-- 自定义渲染格式 -->
       <template #bodyCell="{ column, text, record }">
         <!-- 状态 -->
@@ -75,7 +71,6 @@ onMounted(async () => {
           <div style="display:flex;padding: 5px;gap:10px;">
             <a-button v-if="record.status === '1'" type="primary" size="small"
               @click="jumpToPay(record.id)">支付</a-button>
-            <a-popconfirm title="确定删除该订单吗?" @confirm="deleteOrders([record.id])" ok-text="确定" cancel-text="取消">
             <a-popconfirm title="确定删除该订单吗?" @confirm="deleteOrders([record.id])" ok-text="确定" cancel-text="取消">
               <a-button danger type="link" size="small">删除</a-button>
             </a-popconfirm>
