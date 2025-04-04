@@ -72,7 +72,7 @@ onMounted(async () => {
             <a-button v-if="record.status === '1'" type="primary" size="small"
               @click="jumpToPay(record.id)">支付</a-button>
             <a-popconfirm title="确定删除该订单吗?" @confirm="deleteOrders([record.id])" ok-text="确定" cancel-text="取消">
-              <a-button danger type="link" size="small">删除</a-button>
+              <a-button danger type="primary" size="small">删除</a-button>
             </a-popconfirm>
           </div>
         </template>

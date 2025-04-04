@@ -129,16 +129,17 @@ const loading = ref(false) // 提交订单,按钮loading状态
 // 提交订单
 const submitOrder = async () => {
   loading.value = true
+  // 判断选中商品的数量和收货地址是否存在
+  if(selectedItems.value.length==0 || !selectedAddress.value){
+    message.error(selectedItems.value.length==0 ? '请先选择商品!' : '请先选择收货地址')
+    loading.value = false
+    return
+  }
+
   const orderDetails = selectedItems.value.map((item) => ({
     itemId: item.itemId,
     num: item.num,
   }))
-
-  if (!selectedAddress.value) {
-    message.error('请先选择收货地址')
-    loading.value = false
-    return
-  }
 
   const orderForm = {
     addressId: selectedAddress.value.id,
