@@ -217,8 +217,8 @@ const sortOptions = [
     </div>
 
     <!--商品卡片展示-->
-    <div class="commodity-display">
-      <a-spin :spinning="loading" tip="加载中...">
+    <a-spin :spinning="loading">
+      <div class="commodity-display">
         <a-row>
           <a-empty style="width: 90vw;" v-if="commodity.length === 0" />
           <a-col :span="4" v-for="item in commodity" :key="item.id">
@@ -247,8 +247,8 @@ const sortOptions = [
             </a-card>
           </a-col>
         </a-row>
-      </a-spin>
-    </div>
+      </div>
+    </a-spin>
 
   </div>
 </template>
