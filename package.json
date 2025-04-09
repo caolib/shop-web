@@ -1,6 +1,6 @@
 {
   "name": "shop-web",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -36,7 +36,7 @@
     "npm-run-all2": "^7.0.1",
     "oxlint": "^0.11.0",
     "prettier": "^3.3.3",
-    "vite": "^6.0.9",
+    "vite": "^6.0.12",
     "vite-plugin-vue-devtools": "^7.6.8"
   }
 }
