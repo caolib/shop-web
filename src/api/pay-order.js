@@ -1,6 +1,6 @@
 import request from '@/utils/request.js'
 
-// TODO
+// 获取支付单
 const getPayOrderService = () => {
   return request.get('/pays')
 }

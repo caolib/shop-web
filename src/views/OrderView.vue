@@ -72,22 +72,29 @@ const setDefaultAddress = async (address) => {
 
 // 新增或修改地址
 const addOrUpdateAddr = async () => {
-  // 表单校验
-  formRef.value.validateFields().then(() => {
+  try {
+    // 表单校验
+    await formRef.value.validateFields()
     console.log('表单信息', addressData)
-    visible.value = false
-    formRef.value.resetFields()
-  })
-  if (title.value === '新增地址') {
-    await addAddressService(addressData).then(() => {
-      queryAddress()
-      message.success('新增成功')
-    })
-  } else if (title.value === '修改地址') {
-    await updateAddressService(addressData).then(() => {
-      queryAddress()
-      message.success('修改成功')
-    })
+
+    if (title.value === '新增地址') {
+      await addAddressService(addressData).then(() => {
+        queryAddress()
+        message.success('新增成功')
+        visible.value = false
+        formRef.value.resetFields()
+      })
+    } else if (title.value === '修改地址') {
+      await updateAddressService(addressData).then(() => {
+        queryAddress()
+        message.success('修改成功')
+        visible.value = false
+        formRef.value.resetFields()
+      })
+    }
+  } catch (errorInfo) {
+    console.log('表单校验失败:', errorInfo)
+    message.error('请检查表单信息是否填写完整且正确')
   }
 }
 
@@ -122,24 +129,23 @@ const loading = ref(false) // 提交订单,按钮loading状态
 // 提交订单
 const submitOrder = async () => {
   loading.value = true
+  // 判断选中商品的数量和收货地址是否存在
+  if(selectedItems.value.length==0 || !selectedAddress.value){
+    message.error(selectedItems.value.length==0 ? '请先选择商品!' : '请先选择收货地址')
+    loading.value = false
+    return
+  }
+
   const orderDetails = selectedItems.value.map((item) => ({
     itemId: item.itemId,
     num: item.num,
   }))
-
-  if (!selectedAddress.value) {
-    message.error('请先选择收货地址')
-    loading.value = false
-    return
-  }
 
   const orderForm = {
     addressId: selectedAddress.value.id,
     paymentType: 5,
     details: orderDetails,
   }
-
-  // console.log('订单信息:', orderForm)
 
   // 创建订单
   await createOrderService(orderForm)
@@ -192,6 +198,7 @@ const submitOrder = async () => {
     <div class="address-list">
       <div style="display: flex; justify-content: space-between; align-items: center">
         <h3>收货人信息</h3>
+        <!-- TODO: 新增地址 表单校验-->
         <a-button type="link" size="small" @click="openAddr">新增地址</a-button>
       </div>
       <a-list>
