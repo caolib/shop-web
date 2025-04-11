@@ -41,19 +41,11 @@ onMounted(async () => {
       order.value = res
       if (order.value.status === 5) {
         paySuccess.value = 2;
-
       }
-      // console.log('订单详情', order.value)
     })
     // 创建支付单
     createPayOrder()
   }
-  const createTime = order.value.createTime
-  console.log('订单创建时间', createTime)
-  const deadline = dayjs(createTime).add(10, 'minute')
-  updateCountdown(deadline)
-  interval = setInterval(() => updateCountdown(deadline), 1000)
-
   console.log(paySuccess.value)
 })
 
@@ -73,7 +65,9 @@ const createPayOrder = async () => {
       message.success('订单已支付')
     }
     payOrder.value = res.data;
-    console.log('支付单：', payOrder.value)
+    const deadline = dayjs(payOrder.value.payOverTime)
+    updateCountdown(deadline)
+    interval = setInterval(() => updateCountdown(deadline), 1000)
   })
 }
 
