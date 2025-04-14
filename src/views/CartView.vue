@@ -156,16 +156,13 @@ const checkout = () => {
         <!-- 单价,单位为分 -->
         <template v-if="column.key === 'price'">
           <div>
-            <template v-if="record.newPrice !== null && record.newPrice < record.price">
-              <span style="text-decoration: line-through">
+            <template v-if="record.newPrice !== null && record.newPrice !== record.price">
+              <span style="text-decoration: line-through; color: gray;">
                 ¥{{ (record.price / 100).toFixed(2) }}</span><br />
-              <span>¥{{ (record.newPrice / 100).toFixed(2) }}</span>
-            </template>
-            <template v-else-if="record.newPrice !== null">
-              <span>¥{{ (record.newPrice / 100).toFixed(2) }}</span>
+              <span style="color: red;">¥{{ (record.newPrice / 100).toFixed(2) }}</span>
             </template>
             <template v-else>
-              <span>¥{{ (record.price / 100).toFixed(2) }}</span>
+              <span style="color: red;">¥{{ (record.price / 100).toFixed(2) }}</span>
             </template>
           </div>
         </template>
