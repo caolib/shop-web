@@ -7,8 +7,8 @@ const defaultApiUrl = import.meta.env.VITE_APP_BASE_API
 // 初始 API 列表，至少包含默认环境
 const initialApiUrls = [
   { label: '默认环境', value: defaultApiUrl, deletable: false }, // 默认环境不可删除
-  // 可以添加一些预设环境，并标记为可删除
-  // { label: '预设测试', value: 'http://preset-test.api', deletable: true },
+  { label: 'shop-ddns-go', value: 'https://shop.caolib.ggff.net', deletable: true },
+  { label: 'cloudflare', value: 'https://api.caolib.ggff.net', deletable: true },
 ]
 
 export const useAppConfigStore = defineStore(
