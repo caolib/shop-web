@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- 我的github用户名是 caolib
+- 这是我在github上的一个公开仓库 shop-web-admin
+- 这个仓库是由Tauri构建的一个网上商店桌面程序
+- 项目使用vite、vue3组合式API、antdv、axios
+- 包管理器使用pnpm

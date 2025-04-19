@@ -1,7 +1,9 @@
 {
   "name": "shop-web",
   "version": "1.0.1",
-  "private": true,
+  "private": false,
+  "author": "caolib",
+  "license": "GPL-3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
