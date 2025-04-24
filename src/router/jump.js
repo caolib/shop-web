@@ -3,7 +3,7 @@ import router from "."
 
 // 跳转到登录界面
 const jumpToLogin = (msg) => {
-    message.error(msg)
+    message.info(msg)
     router.push('/login')
 }
 

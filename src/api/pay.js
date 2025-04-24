@@ -14,7 +14,7 @@ const createPayOrderService = (payParams) => {
  * 支付
  */
 const payService = (id, pwd) => {
-  return request.post(`/pays/${id}`, { id: id, pw: pwd })
+  return request.post(`/pays/pay`, { id: id, pw: pwd })
 }
 
 export { createPayOrderService, payService }
