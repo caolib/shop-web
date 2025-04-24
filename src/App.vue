@@ -19,10 +19,9 @@ import { flushUser, isLogin, user } from '@/api/app.js'
 import { goPage, jump } from './router/jump'
 
 const route = useRoute()
-const isActive = (path) => route.path === path // 判断当前显示的页面
+const isActive = (path) => route.path === path
 
-const serviceStatus = ref(new Map()) // 服务状态
-// 所有服务是否正常
+const serviceStatus = ref(new Map())
 const allServicesUp = computed(() => {
   return Array.from(serviceStatus.value.values()).every((status) => status)
 })
@@ -30,7 +29,7 @@ const allServicesUp = computed(() => {
 onMounted(() => {
   flushUser()
   getServiceStatus(serviceStatus)
-  const intervalId = setInterval(() => getServiceStatus(serviceStatus), 60000) // 60s执行一次
+  const intervalId = setInterval(() => getServiceStatus(serviceStatus), 60000)
   onUnmounted(() => clearInterval(intervalId))
 })
 

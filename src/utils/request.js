@@ -3,11 +3,13 @@ import router from '@/router'
 
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/userInfo'
+import { useAppConfigStore } from '@/stores/appConfig'
 import { jumpToLogin } from '@/router/jump'
 
-const baseURL = import.meta.env.VITE_APP_BASE_API
-const instance = axios.create({ baseURL })
-
+const defaultBaseURL = import.meta.env.VITE_APP_BASE_API
+const instance = axios.create({
+  timeout: 10000,
+})
 
 // 获取用户存储
 const getUserStore = () => {
@@ -28,21 +30,21 @@ instance.interceptors.response.use(
     // 使用 switch 替换 if-else 语句
     switch (code) {
       case 400:
-        message.error(msg);
-        break;
+        message.error(msg)
+        break
       case 401:
-        jumpToLogin('请先登录！');
-        break;
+        jumpToLogin('请先登录！')
+        break
       case 499:
-        jumpToLogin('身份过期,请重新登录！');
-        break;
+        jumpToLogin('身份过期,请重新登录！')
+        break
       case 500:
-        message.error(msg);
-        console.log(msg);
-        break;
+        message.error(msg)
+        console.log(msg)
+        break
       default:
-        message.error('未知异常！' + code);
-        break;
+        message.error('未知异常！' + code)
+        break
     }
     return Promise.reject(result)
   },
@@ -90,11 +92,12 @@ instance.interceptors.response.use(
  */
 instance.interceptors.request.use(
   (config) => {
-    // console.log('baseURL:', config.baseURL)
+    const appConfigStore = useAppConfigStore()
+    config.baseURL = appConfigStore.activeApiUrl || defaultBaseURL
 
     const noAuthUrls = ['/login', '/register', 'health']
     // 如果是不需要认证的url直接放行
-    if (noAuthUrls.some(url => config.url.endsWith(url))) {
+    if (noAuthUrls.some((url) => config.url.endsWith(url))) {
       return config
     }
     const userInfo = getUserStore()
