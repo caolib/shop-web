@@ -22,6 +22,8 @@ const updateAddressService = (address) => {
  * @param address 新增地址信息 
  */
 const addAddressService = (address) => {
+  address.isDefault = 0
+  address.id = null
   console.log(address)
   return request.post(`/addresses`, address)
 }

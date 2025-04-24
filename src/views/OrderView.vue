@@ -72,31 +72,31 @@ const setDefaultAddress = async (address) => {
 
 // 新增或修改地址
 const addOrUpdateAddr = async () => {
-  try {
-    // 表单校验
-    await formRef.value.validateFields()
-    console.log('表单信息', addressData)
+  // 表单校验
+  console.log('表单信息', addressData)
 
-    if (title.value === '新增地址') {
-      await addAddressService(addressData).then(() => {
-        queryAddress()
-        message.success('新增成功')
-        visible.value = false
-        formRef.value.resetFields()
-      })
-    } else if (title.value === '修改地址') {
-      await updateAddressService(addressData).then(() => {
-        queryAddress()
-        message.success('修改成功')
-        visible.value = false
-        formRef.value.resetFields()
-      })
-    }
-  } catch (errorInfo) {
-    console.log('表单校验失败:', errorInfo)
-    message.error('请检查表单信息是否填写完整且正确')
+  // 新增地址
+  if (title.value === '新增地址') {
+    await addAddressService(addressData).then(() => {
+      queryAddress()
+      message.success('新增成功')
+    }).finally(() => {
+      visible.value = false
+      formRef.value.resetFields()
+    })
+    return
   }
+
+  // 修改地址
+  await updateAddressService(addressData).then(() => {
+    queryAddress()
+    message.success('修改成功')
+  }).finally(() => {
+    visible.value = false
+    formRef.value.resetFields()
+  })
 }
+
 
 const formRef = ref()
 const visible = ref(false)
@@ -130,8 +130,8 @@ const loading = ref(false) // 提交订单,按钮loading状态
 const submitOrder = async () => {
   loading.value = true
   // 判断选中商品的数量和收货地址是否存在
-  if(selectedItems.value.length==0 || !selectedAddress.value){
-    message.error(selectedItems.value.length==0 ? '请先选择商品!' : '请先选择收货地址')
+  if (selectedItems.value.length == 0 || !selectedAddress.value) {
+    message.error(selectedItems.value.length == 0 ? '请先选择商品!' : '请先选择收货地址')
     loading.value = false
     return
   }
