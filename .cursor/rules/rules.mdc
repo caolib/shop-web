@@ -11,3 +11,4 @@ alwaysApply: true
 - 这个仓库是由Tauri构建的一个网上商店桌面程序
 - 项目使用vite、vue3组合式API、antdv、axios
 - 包管理器使用pnpm
+- 你可以使用mcp服务查看浏览器控制台信息

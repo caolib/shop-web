@@ -75,66 +75,167 @@ const cancelAccount = async () => {
 </script>
 
 <template>
-  <div class="container">
-    <!-- 用户信息 -->
-    <a-spin :spinning="userLoading" tip="加载中...">
-      <a-card hoverable class="user-card">
-        <!-- 用户名 -->
-        <a-card-meta :title="user.username">
-          <!-- 头像 -->
-          <template #avatar>
-            <a-avatar style="margin-bottom: 20px;" :src="avatarUrl" />
-          </template>
-        </a-card-meta>
+  <div class="user-page">
+    <!-- 用户信息卡片 -->
+    <a-row class="user-container">
+      <a-col :span="16" :offset="4">
+        <a-spin :spinning="userLoading" tip="加载中...">
+          <!-- 主卡片 -->
+          <a-card hoverable class="user-main-card">
+            <a-row>
+              <!-- 左侧用户基本信息 -->
+              <a-col :span="8" class="user-profile-section">
+                <div class="avatar-container">
+                  <a-avatar :size="100" :src="avatarUrl" />
+                </div>
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-tag" v-if="user.provider === 'github'">
+                  <a-tag color="black">
+                    <GithubFilled /> GitHub
+                  </a-tag>
+                </div>
+              </a-col>
 
-        <p>电话: {{ user.phone }}</p>
-        <p>余额: {{ (user.balance / 100).toFixed(2) }} 元</p>
-        <p v-if="user.provider === 'github'">已绑定：
-          <GithubFilled style="margin-right: 10px;" />{{ user.oauth_name }}
-        </p>
-        <a-button @click="openPwdForm" size="small">修改密码</a-button>
-        <a-button @click="visible2 = true" :loading="loading" danger style="margin-left: 10px;" size="small"
-          type="primary">注销账号</a-button>
-      </a-card>
-    </a-spin>
+              <!-- 右侧用户详细信息和操作 -->
+              <a-col :span="16" class="user-details-section">
+                <div class="detail-item">
+                  <a-row>
+                    <a-col :span="8" class="detail-label">电话号码</a-col>
+                    <a-col :span="16" class="detail-value">{{ user.phone || '未设置' }}</a-col>
+                  </a-row>
+                </div>
+
+                <div class="detail-item">
+                  <a-row>
+                    <a-col :span="8" class="detail-label">账户余额</a-col>
+                    <a-col :span="16" class="detail-value">
+                      <span class="balance-amount">￥{{ (user.balance / 100).toFixed(2) }}</span>
+                    </a-col>
+                  </a-row>
+                </div>
+
+                <div class="detail-item" v-if="user.provider === 'github'">
+                  <a-row>
+                    <a-col :span="8" class="detail-label">绑定账号</a-col>
+                    <a-col :span="16" class="detail-value">
+                      <GithubFilled style="margin-right: 8px;" />{{ user.oauth_name }}
+                    </a-col>
+                  </a-row>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons">
+                  <a-button type="primary" @click="openPwdForm" size="middle">
+                    修改密码
+                  </a-button>
+                  <a-button danger @click="visible2 = true" :loading="loading" size="middle" style="margin-left: 12px;">
+                    注销账号
+                  </a-button>
+                </div>
+              </a-col>
+            </a-row>
+          </a-card>
+        </a-spin>
+      </a-col>
+    </a-row>
 
     <!-- 修改密码对话框 -->
     <a-modal v-model:open="visible" @ok="updatePwd" title="修改密码" centered>
       <a-form>
         <a-form-item label="原密码" name="oldPwd">
-          <a-input v-model:value="pwdForm.oldPwd" />
+          <a-input v-model:value="pwdForm.oldPwd" type="password" placeholder="请输入原密码" />
         </a-form-item>
         <a-form-item label="新密码" name="newPwd">
-          <a-input v-model:value="pwdForm.newPwd" />
+          <a-input v-model:value="pwdForm.newPwd" type="password" placeholder="请输入新密码" />
         </a-form-item>
       </a-form>
     </a-modal>
 
     <!-- 账号注销对话框 -->
     <a-modal v-model:open="visible2" title="确定注销账号？" centered @ok="cancelAccount">
-      <p style="color: red">注销账号后，您的所有数据将被清空，且无法恢复！</p>
+      <div class="warning-message">
+        <a-alert type="error" message="注销账号后，您的所有数据将被清空，且无法恢复！" banner />
+      </div>
     </a-modal>
   </div>
-
-
-
-
 </template>
 
 <style lang="less" scoped>
 @import '@/styles/var';
 
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  padding: 20px;
-  overflow: hidden;
+.user-page {
+  min-height: 90vh;
+  padding: 30px 20px;
+  background-color: #f7f9fc;
 }
 
-.user-card {
-  padding: 20px;
+.user-container {
+  margin-top: 20px;
+}
+
+.user-main-card {
+  border-radius: 12px;
+  overflow: hidden;
   box-shadow: @box-shadow;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.user-profile-section {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid #f0f0f0;
+}
+
+.avatar-container {
+  margin-bottom: 16px;
+}
+
+.user-name {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.user-tag {
+  margin-top: 8px;
+}
+
+.user-details-section {
+  padding: 30px;
+}
+
+.detail-item {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.detail-label {
+  color: #8c8c8c;
+  text-align: left;
+}
+
+.detail-value {
+  font-weight: 500;
+}
+
+.balance-amount {
+  color: @red;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.action-buttons {
+  margin-top: 32px;
+  display: flex;
+}
+
+.warning-message {
+  padding: 10px 0;
 }
 </style>
