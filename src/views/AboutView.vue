@@ -20,6 +20,7 @@ const techIcons = [
   { i: 'css', alt: 'CSS' },
   { i: 'git', alt: 'Git' },
   { i: 'pnpm', alt: 'pnpm' },
+  { i: 'cloudflare', alt: 'Cloudflare' },
 ];
 
 // App Config Store
@@ -121,16 +122,12 @@ const handleRemoveApi = (apiUrlValue) => {
 
           <!-- 技术栈展示 -->
           <div class="tech-stack-section">
-            <h3 class="section-title">技术栈</h3>
+            <h3 class="section-title">技术栈&工具</h3>
             <div class="tech-icons-container">
               <a-space wrap :size="[16, 16]" class="tech-icons">
                 <div v-for="icon in techIcons" :key="icon.i" class="tech-icon-item">
                   <img :src="`https://skillicons.dev/icons?i=${icon.i}&theme=light`" :alt="icon.alt">
                   <span class="icon-name">{{ icon.alt }}</span>
-                </div>
-                <div class="tech-icon-item">
-                  <img src="https://skillicons.dev/icons?i=github&theme=light" alt="GitHub">
-                  <span class="icon-name">GitHub</span>
                 </div>
               </a-space>
             </div>
