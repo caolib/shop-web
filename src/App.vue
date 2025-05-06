@@ -11,7 +11,8 @@ import {
   ExclamationCircleFilled,
   ArrowLeftOutlined,
   ArrowRightOutlined,
-  MenuOutlined
+  MenuOutlined,
+  SyncOutlined
 } from '@ant-design/icons-vue'
 import { checkSrv, getServiceStatus } from '@/api/status.js'
 import { useRoute } from 'vue-router'
@@ -22,15 +23,48 @@ import { goPage, jump } from './router/jump'
 const route = useRoute()
 const isActive = (path) => route.path === path
 
-const serviceStatus = ref(new Map())
+// 用于存储从API获取的原始Map数据
+const serviceStatusMap = ref(new Map())
+// 用于模板渲染的服务列表数组
+const serviceList = ref([])
+const isRefreshing = ref(false)
+
 const allServicesUp = computed(() => {
-  return Array.from(serviceStatus.value.values()).every((status) => status)
+  if (serviceList.value.length === 0 && !isRefreshing.value) { // 如果列表为空且不在刷新，则认为正常（或无服务）
+    return true;
+  }
+  return serviceList.value.length > 0 && serviceList.value.every(item => item.status)
 })
+
+// 刷新服务状态
+const refreshServices = async () => {
+  if (isRefreshing.value) return
+  isRefreshing.value = true
+  try {
+    await getServiceStatus(serviceStatusMap) // getServiceStatus 会直接修改 serviceStatusMap.value
+
+    if (serviceStatusMap.value && typeof serviceStatusMap.value.entries === 'function') {
+      const newList = []
+      for (const [name, status] of serviceStatusMap.value.entries()) {
+        newList.push({ name, status })
+      }
+      serviceList.value = newList
+    } else {
+      console.error('getServiceStatus did not populate serviceStatusMap.value correctly or it is not a Map.')
+      serviceList.value = [] // 清空列表或显示错误提示
+    }
+  } catch (error) {
+    console.error('刷新服务状态失败:', error)
+    serviceList.value = [] // 发生错误时清空列表
+  } finally {
+    isRefreshing.value = false
+  }
+}
 
 onMounted(() => {
   flushUser()
-  getServiceStatus(serviceStatus)
-  const intervalId = setInterval(() => getServiceStatus(serviceStatus), 60000)
+  refreshServices() // 初始加载
+  const intervalId = setInterval(refreshServices, 60000) // 定时刷新
   onUnmounted(() => clearInterval(intervalId))
 })
 </script>
@@ -78,17 +112,34 @@ onMounted(() => {
       <div class="navbar-right">
         <!-- 服务状态 -->
         <div class="status-indicator">
-          <a-dropdown placement="bottomRight">
-            <div class="status-icon">
-              <CheckCircleFilled class="status-up" v-if="allServicesUp" />
-              <ExclamationCircleFilled class="status-down" v-else />
+          <a-dropdown placement="bottomRight" trigger="hover">
+            <div class="status-icon-wrapper" :title="allServicesUp ? '所有服务正常' : '部分服务异常'">
+              <CheckCircleFilled class="status-icon status-up" v-if="allServicesUp" />
+              <ExclamationCircleFilled class="status-icon status-down" v-else />
+              <span class="status-text-brief">{{ allServicesUp ? '服务正常' : '服务异常' }}</span>
             </div>
             <template #overlay>
               <a-menu class="status-menu">
-                <a-menu-item v-for="(status, service) in serviceStatus" :key="service">
-                  <span @click="checkSrv(status[0])" :class="{ 'status-up': status[1], 'status-down': !status[1] }">
-                    {{ status[0] }}
-                  </span>
+                <div v-if="isRefreshing && serviceList.length === 0" class="status-menu-loading">
+                  <a-spin size="small" />
+                  <span>&nbsp;加载中...</span>
+                </div>
+                <div v-else-if="!isRefreshing && serviceList.length === 0" class="status-menu-empty">
+                  <span>暂无服务或获取失败</span>
+                </div>
+                <template v-else>
+                  <a-menu-item v-for="serviceItem in serviceList" :key="serviceItem.name" class="service-status-item">
+                    <div @click="checkSrv(serviceItem.name)" class="service-item-content">
+                      <CheckCircleFilled v-if="serviceItem.status" class="status-icon status-up" />
+                      <ExclamationCircleFilled v-else class="status-icon status-down" />
+                      <span class="service-name">{{ serviceItem.name }}</span>
+                    </div>
+                  </a-menu-item>
+                </template>
+                <a-menu-divider />
+                <a-menu-item @click="refreshServices" class="status-menu-refresh">
+                  <SyncOutlined :spin="isRefreshing" />
+                  <span>&nbsp;{{ isRefreshing ? '刷新中...' : '刷新状态' }}</span>
                 </a-menu-item>
               </a-menu>
             </template>
@@ -130,8 +181,6 @@ onMounted(() => {
 
           <div v-else class="login-btns">
             <a-button type="link" class="login-btn" @click="jump('/login')">登录</a-button>
-            <span class="divider">/</span>
-            <a-button type="link" class="login-btn" @click="jump('/')">注册</a-button>
           </div>
         </div>
       </div>
@@ -258,17 +307,106 @@ onMounted(() => {
 }
 
 .status-indicator {
-  .status-icon {
-    font-size: 16px;
+  .status-icon-wrapper {
+    display: flex;
+    align-items: center;
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+
+  .status-icon {
+    font-size: 16px; // 调整图标大小
+  }
+
+  .status-text-brief {
+    margin-left: 6px;
+    font-size: 13px; // 调整文字大小
+    color: #555;
   }
 
   .status-up {
-    color: @primary-color;
+    color: @primary-color !important;
   }
 
   .status-down {
-    color: @red;
+    color: @red !important;
+  }
+}
+
+.status-menu {
+  width: fit-content;
+  min-width: 160px;
+  padding: 4px 0;
+
+  .status-menu-loading,
+  .status-menu-empty {
+    padding: 10px 12px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .service-status-item {
+    padding: 0;
+
+    .service-item-content {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      .status-icon {
+        margin-right: 8px;
+        font-size: 14px;
+      }
+
+      .status-up {
+        color: @primary-color !important;
+      }
+
+      .status-down {
+        color: @red !important;
+      }
+
+      .service-name {
+        flex-grow: 1;
+        font-size: 13px;
+        color: #333;
+      }
+    }
+  }
+
+  .status-menu-refresh {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: @primary-color;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: tint(@primary-color, 90%) !important;
+      color: @primary-color !important;
+    }
+
+    .anticon-sync {
+      margin-right: 6px;
+    }
   }
 }
 
@@ -294,6 +432,7 @@ onMounted(() => {
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
+    color: #333;
 
     &:hover {
       background-color: #f5f5f5;
@@ -333,7 +472,7 @@ onMounted(() => {
 }
 
 .main-content {
-  margin-top: 70px;
+  margin-top: 70px; // 顶部导航栏高度 + 一些间距
   min-height: calc(100vh - 70px);
 }
 
@@ -341,7 +480,9 @@ onMounted(() => {
 @media (max-width: 768px) {
 
   .main-nav,
-  .nav-history {
+  .nav-history,
+  .status-text-brief {
+    // 在移动端隐藏简要状态文字
     display: none;
   }
 
@@ -361,6 +502,16 @@ onMounted(() => {
   .navbar-container {
     padding: 0 10px;
   }
+
+  .status-indicator {
+    .status-icon-wrapper {
+      padding: 4px; // 减少移动端padding
+    }
+  }
+
+  .navbar-right {
+    gap: 8px;
+  }
 }
 
 /* 平板适配 */
@@ -379,6 +530,11 @@ onMounted(() => {
   }
 
   .username {
+    display: none;
+  }
+
+  .status-text-brief {
+    // 在平板也隐藏简要状态文字
     display: none;
   }
 }
